@@ -1,0 +1,17 @@
+name: example
+description: "Demonstrates how to use the connectivity_plus_linux_portal."
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  connectivity_plus_linux_portal:
+    path: ../
+  connectivity_plus: ^7.1.1
+
+flutter:
+  uses-material-design: true
