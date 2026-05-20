@@ -1,3 +1,7 @@
+## 0.0.2
+
+- Fixes wrong repository link (package metadata).
+
 ## 0.0.1
 
 - Initial release.
