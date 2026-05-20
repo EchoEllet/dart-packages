@@ -2,6 +2,8 @@ name: connectivity_plus_linux_portal
 description: A Linux implementation of connectivity_plus that uses xdg_desktop_portal
 version: 0.0.1
 resolution: workspace
+repository: https://github.com/LibreLabApp/librelab/tree/main/packages/connectivity_plus_linux_portal
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20connectivity_plus_linux_portal
 
 environment:
   sdk: ^3.12.0
