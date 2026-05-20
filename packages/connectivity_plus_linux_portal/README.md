@@ -39,6 +39,12 @@ Future<void> main() async {
 }
 ```
 
+### Manual testing
+
+```shell
+CONNECTIVITY_BACKEND=portal flutter run -d linux
+```
+
 ### Flatpak manifest
 
 Pass the environment variable in the Flatpak manifest (optional fallback in case `FLATPAK_ID` env variable was not found):
@@ -46,12 +52,6 @@ Pass the environment variable in the Flatpak manifest (optional fallback in case
 ```yaml
 finish-args:
   - "--env=CONNECTIVITY_BACKEND=portal"
-```
-
-### Manual testing
-
-```shell
-flutter run -d linux --dart-define=CONNECTIVITY_BACKEND=portal
 ```
 
 ## Motivation

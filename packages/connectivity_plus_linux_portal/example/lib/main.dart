@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 
 void main() {
   if (Platform.isLinux && shouldUsePortal()) {
+    print('Using org.freedesktop.portal.NetworkMonitor for connectivity_plus');
     ConnectivityPlusLinuxPortalPlugin.registerWith();
   }
 
