@@ -1,3 +1,8 @@
+/// A Linux implementation of [connectivity_plus](https://pub.dev/packages/connectivity_plus)
+/// that uses XDG Desktop Portal ([`org.freedesktop.portal.NetworkMonitor`](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.NetworkMonitor.html))
+/// for sandbox compliance (e.g., Flathub/Flatpak).
+library;
+
 import 'dart:async';
 
 import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
@@ -5,13 +10,23 @@ import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 
 typedef XdgDesktopPortalClientFactory = XdgDesktopPortalClient Function();
 
-/// Uses `org.freedesktop.portal.NetworkMonitor`.
+/// Uses [`org.freedesktop.portal.NetworkMonitor`](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.NetworkMonitor.html).
 ///
 /// **Note**: This is more limited compared to `org.freedesktop.NetworkManager`
 /// (the [default `connectivity_plus` Linux implementation](https://github.com/fluttercommunity/plus_plugins/blob/5b4774683d6e186fbd69cf4208302221f52aa54d/packages/connectivity_plus/connectivity_plus/lib/src/connectivity_plus_linux.dart))
-/// and typically supports fewer [ConnectivityResult] types (for security/sandbox reasons).
+/// and typically supports fewer [ConnectivityResult] types (for security/sandbox reasons):
+///
+/// - No network: [ConnectivityResult.none]
+/// - Connected to a network: [ConnectivityResult.other] (unknown)
+/// - Captive portal: Assumes [ConnectivityResult.wifi]
+/// - Network is metered: Assumes [ConnectivityResult.mobile]
+///
+/// The limitation above is **not** relevant when only the general
+/// connectivity state is required (connected vs disconnected),
+/// independent of the underlying transport (e.g., Wifi, Ethernet).
 class ConnectivityPlusLinuxPortalPlugin extends ConnectivityPlatform {
-  ConnectivityPlusLinuxPortalPlugin({this._factory});
+  ConnectivityPlusLinuxPortalPlugin({XdgDesktopPortalClientFactory? factory})
+    : _factory = factory;
 
   final XdgDesktopPortalClientFactory? _factory;
 

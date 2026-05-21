@@ -10,3 +10,6 @@ pubspec_overrides.yaml
 
 # macOS
 .DS_Store
+
+# https://dart.dev/tools/pub/private-files#the-rules
+pubspec.lock
