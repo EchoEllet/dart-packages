@@ -1,3 +1,8 @@
+## 0.0.4
+
+- Adds topics to package metadata.
+- Adds reference to `serverpod_flutter` (as an example package that uses `connectivity_plus`) in `README.md`
+
 ## 0.0.3
 
 - Updates minimum supported SDK version to Dart 3.10.

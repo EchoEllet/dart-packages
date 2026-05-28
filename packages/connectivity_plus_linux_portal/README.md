@@ -51,7 +51,7 @@ Pass the environment variable in the Flatpak manifest (optional fallback in case
 
 ```yaml
 finish-args:
-  - "--env=CONNECTIVITY_BACKEND=portal"
+  - --env=CONNECTIVITY_BACKEND=portal
 ```
 
 ## Motivation
@@ -90,6 +90,7 @@ As a result, fewer `ConnectivityResult` types are supported (by design for sandb
 
 > [!TIP]
 > This limitation is not relevant when only the general connectivity state is required (connected vs disconnected), independent of the underlying transport (e.g., Wifi, Ethernet).
+> In many cases, this is not an issue (e.g., [serverpod_flutter](https://github.com/serverpod/serverpod/blob/1aa3e67130f44d5b8f7ec887001af73e262c523f/packages/serverpod_flutter/lib/src/flutter_connectivity_monitor.dart#L22-L23)).
 
 You can use the portal implementation only for the Flatpak version (e.g., via environment variable or argument) and keep the default implementation (as shown in [this section](#getting-started)).
 
