@@ -1,0 +1,16 @@
+name: example
+description: "Demonstrates how to use the is_ios_simulator plugin."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  is_ios_simulator:
+    path: ../
+
+flutter:
+  uses-material-design: true

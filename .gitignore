@@ -13,3 +13,11 @@ pubspec_overrides.yaml
 
 # https://dart.dev/tools/pub/private-files#the-rules
 pubspec.lock
+
+# Swift Package Manager
+.build
+.swiftpm
+
+# Generated Flutter directory
+Flutter
+Runner/
