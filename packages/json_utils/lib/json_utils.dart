@@ -42,44 +42,47 @@ Result<JsonMap, JsonDecodingFailure> tryJsonDecode(String json) {
   try {
     final decoded = convert.jsonDecode(json);
     if (decoded is JsonMap) {
-      return Result.success(decoded);
+      return .success(decoded);
     }
     if (decoded is List) {
       // Avoid root JSON lists because they require workarounds to add new properties.
       // All APIs use JSON objects at the root.
       // Decoding JSON lists as root is not needed.
-      throw ArgumentError.value(
-        json,
-        'json',
-        'Expected a JSON object ($JsonMap) but got a JSON list. Root JSON lists are not supported.',
-      );
+      assert(() {
+        throw ArgumentError.value(
+          json,
+          'json',
+          'Expected a JSON object ($JsonMap) but got a JSON list. Root JSON lists are not supported.',
+        );
+      }(), null);
     }
-    throw ArgumentError.value(
-      json,
-      'json',
-      'Expected a JSON object ($JsonMap) but got ${decoded.runtimeType}.',
-    );
+
+    final message =
+        'Expected a JSON object ($JsonMap) but got ${decoded.runtimeType}.';
+    assert(() {
+      throw ArgumentError.value(json, 'json', message);
+    }(), null);
+
+    return .failure(JsonDecodingFailure(json, message));
   } on FormatException catch (e) {
-    return Result.failure(JsonDecodingFailure(json, e.message));
+    return .failure(JsonDecodingFailure(json, e.message));
   }
 }
 
 /// Callers should strongly prefer [tryJsonDecode] over [jsonDecode].
-JsonMap jsonDecode(String json) => tryJsonDecode(json).valueOrThrow;
+JsonMap jsonDecodeOrThrow(String json) => tryJsonDecode(json).valueOrThrow;
 
 Result<T, JsonDeserializationFailure> tryJsonDeserialize<T>(
   JsonMap decodedJson,
   T Function(JsonMap json) fromJson,
 ) {
   try {
-    return Result.success(fromJson(decodedJson));
+    return .success(fromJson(decodedJson));
     // fromJson() often uses 'as' and '!' operators, which can throw if the JSON
     // does not match the expected structure. This workaround catches those errors as failures.
     // ignore: avoid_catching_errors
   } on TypeError catch (e) {
-    return Result.failure(
-      JsonDeserializationFailure(decodedJson, e.toString()),
-    );
+    return .failure(JsonDeserializationFailure(decodedJson, e.toString()));
   }
 }
 
@@ -91,7 +94,7 @@ Result<T, JsonParseFailure> tryJsonParse<T>(
 
   final decoded = jsonDecodeResult.valueOrNull;
   if (decoded == null) {
-    return Result.failure(jsonDecodeResult.failureOrThrow);
+    return .failure(jsonDecodeResult.failureOrThrow);
   }
 
   final jsonDeserializationResult = tryJsonDeserialize(
@@ -102,8 +105,8 @@ Result<T, JsonParseFailure> tryJsonParse<T>(
   final deserialized = jsonDeserializationResult.valueOrNull;
 
   if (deserialized == null) {
-    return Result.failure(jsonDeserializationResult.failureOrThrow);
+    return .failure(jsonDeserializationResult.failureOrThrow);
   }
 
-  return Result.success(deserialized);
+  return .success(deserialized);
 }
