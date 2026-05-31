@@ -1,0 +1,10 @@
+name: result
+description: "Utility to implement the Result pattern."
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  meta: ^1.16.0
