@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 
 @immutable
 abstract class BaseFailure {
-  const BaseFailure(this.message);
+  const BaseFailure([this.message]);
 
   /// A technical message describing the failure.
   ///
@@ -10,10 +10,10 @@ abstract class BaseFailure {
   /// It is typically detailed and not user-friendly.
   ///
   /// This should not be used in the user-facing UI error message.
-  final String message;
+  final String? message;
 
   @override
-  String toString() => message;
+  String toString() => message ?? 'null';
 }
 
 // See also: https://docs.flutter.dev/app-architecture/design-patterns/result
@@ -44,12 +44,14 @@ sealed class Result<V, F extends BaseFailure> {
   V get valueOrThrow =>
       valueOrNull ??
       (throw StateError(
-        'Expected the result to be in success state but was $runtimeType',
+        'Expected the result to be in success state but was $runtimeType\n'
+        'Failure: $failureOrNull',
       ));
   F get failureOrThrow =>
       failureOrNull ??
       (throw StateError(
-        'Expected the result to be in failure state but was $runtimeType',
+        'Expected the result to be in failure state but was $runtimeType\n'
+        'Value: $valueOrNull',
       ));
 
   R fold<R>({
