@@ -4,8 +4,11 @@ import 'package:api_client/src/multipart/multipart_body.dart'
     show MultipartBody;
 import 'package:api_client/src/request_body.dart';
 import 'package:http/http.dart' as http show MultipartFile;
+import 'package:http_method/http_method.dart';
 import 'package:json_utils/json_utils.dart';
 import 'package:result/result.dart';
+
+export 'package:http_method/http_method.dart' show HttpMethod;
 
 /// An HTTP client for APIs that return responses using the [Result] pattern.
 ///
@@ -104,21 +107,6 @@ abstract interface class ApiClient {
     Map<String, String>? headers,
     RequestBody? body,
   });
-}
-
-enum HttpMethod {
-  get(supportsRequestBody: false),
-  post(supportsRequestBody: true),
-  put(supportsRequestBody: true),
-  patch(supportsRequestBody: true),
-  delete(supportsRequestBody: true);
-
-  const HttpMethod({required this.supportsRequestBody});
-
-  // The values respect: https://datatracker.ietf.org/doc/html/rfc7231
-  final bool supportsRequestBody;
-
-  String get httpName => name.toUpperCase();
 }
 
 typedef JsonResponseDeserializer<T> = T Function(JsonHttpResponse response);

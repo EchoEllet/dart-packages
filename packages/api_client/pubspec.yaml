@@ -12,6 +12,8 @@ dependencies:
   json_utils:
     path: ../json_utils
   http: ^1.4.0
+  http_method:
+    path: ../http_method
   meta: ^1.16.0
 
 dev_dependencies:

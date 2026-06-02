@@ -1,0 +1,9 @@
+name: http_method
+description: |
+  Minimal enum for common application HTTP methods (GET, POST, PUT, PATCH, DELETE).
+  For API contracts and REST semantics, not full IANA method coverage.
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: ^3.12.0
