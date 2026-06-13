@@ -13,7 +13,7 @@ String jsonEncodePretty(JsonMap jsonMap) =>
 
 String jsonEncode(JsonMap json) => convert.jsonEncode(json);
 
-sealed class JsonParseFailure extends BaseFailure {
+sealed class JsonParseFailure extends Failure {
   const JsonParseFailure(super.message);
 }
 

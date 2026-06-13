@@ -3,7 +3,7 @@ import 'package:json_utils/json_utils.dart';
 import 'package:result/result.dart';
 
 /// Base class for all API client failures, including general and JSON-specific errors.
-sealed class ApiFailure<Body> extends BaseFailure {
+sealed class ApiFailure<Body> extends Failure {
   const ApiFailure(super.message);
 }
 

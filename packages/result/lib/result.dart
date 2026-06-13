@@ -1,8 +1,11 @@
 import 'package:meta/meta.dart';
 
+@Deprecated('Use Failure instead of BaseFailure')
+typedef BaseFailure = Failure;
+
 @immutable
-abstract class BaseFailure {
-  const BaseFailure([this.message]);
+abstract class Failure {
+  const Failure([this.message]);
 
   /// A technical message describing the failure.
   ///
@@ -18,7 +21,7 @@ abstract class BaseFailure {
 
 // See also: https://docs.flutter.dev/app-architecture/design-patterns/result
 @immutable
-sealed class Result<V, F extends BaseFailure> {
+sealed class Result<V, F extends Failure> {
   const Result();
 
   factory Result.success(V value) => SuccessResult(value);
@@ -29,7 +32,7 @@ sealed class Result<V, F extends BaseFailure> {
   // since Dart does not support `void` as a value type like Kotlin's `Unit`.
   // The warning is safe to ignore because [_Unit] is intentionally used here
   // ignore: library_private_types_in_public_api
-  static Result<_Unit, F> emptySuccess<F extends BaseFailure>() =>
+  static Result<_Unit, F> emptySuccess<F extends Failure>() =>
       Result<_Unit, F>.success(_unit);
 
   bool get isFailure => this is FailureResult;
@@ -74,17 +77,16 @@ sealed class Result<V, F extends BaseFailure> {
   };
 
   /// Maps a failure value while preserving the success type.
-  Result<V, R> mapFailure<R extends BaseFailure>(
-    R Function(F value) transform,
-  ) => switch (this) {
-    final SuccessResult<V, F> success => Result.success(success.value),
-    final FailureResult<V, F> failure => Result.failure(
-      transform(failure.failure),
-    ),
-  };
+  Result<V, R> mapFailure<R extends Failure>(R Function(F value) transform) =>
+      switch (this) {
+        final SuccessResult<V, F> success => Result.success(success.value),
+        final FailureResult<V, F> failure => Result.failure(
+          transform(failure.failure),
+        ),
+      };
 
   /// Maps both success and failure to potentially new types.
-  Result<NV, NF> map<NV, NF extends BaseFailure>({
+  Result<NV, NF> map<NV, NF extends Failure>({
     required NV Function(V value) onSuccess,
     required NF Function(F failure) onFailure,
   }) => switch (this) {
@@ -103,7 +105,7 @@ sealed class Result<V, F extends BaseFailure> {
       };
 }
 
-final class SuccessResult<V, F extends BaseFailure> extends Result<V, F> {
+final class SuccessResult<V, F extends Failure> extends Result<V, F> {
   const SuccessResult(this.value);
 
   final V value;
@@ -112,7 +114,7 @@ final class SuccessResult<V, F extends BaseFailure> extends Result<V, F> {
   String toString() => 'Result<$V>.success($value)';
 }
 
-final class FailureResult<V, F extends BaseFailure> extends Result<V, F> {
+final class FailureResult<V, F extends Failure> extends Result<V, F> {
   const FailureResult(this.failure);
 
   final F failure;
@@ -127,7 +129,7 @@ class _Unit {
 
 const _unit = _Unit._();
 
-typedef EmptyResult<F extends BaseFailure> = Result<_Unit, F>;
+typedef EmptyResult<F extends Failure> = Result<_Unit, F>;
 
 @visibleForTesting
-typedef EmptySuccessResult<F extends BaseFailure> = SuccessResult<_Unit, F>;
+typedef EmptySuccessResult<F extends Failure> = SuccessResult<_Unit, F>;
