@@ -5,7 +5,7 @@ typedef BaseFailure = Failure;
 
 @immutable
 abstract class Failure {
-  const Failure([this.message]);
+  const Failure(this.message);
 
   /// A technical message describing the failure.
   ///
@@ -13,10 +13,10 @@ abstract class Failure {
   /// It is typically detailed and not user-friendly.
   ///
   /// This should not be used in the user-facing UI error message.
-  final String? message;
+  final String message;
 
   @override
-  String toString() => message ?? 'null';
+  String toString() => message;
 }
 
 // See also: https://docs.flutter.dev/app-architecture/design-patterns/result
