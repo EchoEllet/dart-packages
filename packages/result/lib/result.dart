@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:meta/meta.dart';
 
 @Deprecated('Use Failure instead of BaseFailure')
@@ -88,14 +86,12 @@ sealed class Result<V, F extends Failure> {
       };
 
   /// Maps both success and failure to potentially new types.
-  Future<Result<NV, NF>> map<NV, NF extends Failure>({
-    required FutureOr<NV> Function(V value) onSuccess,
-    required FutureOr<NF> Function(F failure) onFailure,
-  }) async => switch (this) {
-    SuccessResult<V, F>(:final value) => Result.success(await onSuccess(value)),
-    FailureResult<V, F>(:final failure) => Result.failure(
-      await onFailure(failure),
-    ),
+  Result<NV, NF> map<NV, NF extends Failure>({
+    required NV Function(V value) onSuccess,
+    required NF Function(F failure) onFailure,
+  }) => switch (this) {
+    SuccessResult<V, F>(:final value) => Result.success(onSuccess(value)),
+    FailureResult<V, F>(:final failure) => Result.failure(onFailure(failure)),
   };
 
   /// Chains another [Result] if this is a success.
