@@ -48,6 +48,14 @@ sealed class JsonApiFailure<Body> extends ApiFailure<Body> {
   const JsonApiFailure(super.message);
 }
 
+// TODO: Consider this pattern (wrapping an existing failure over mapping the types)
+//  if done, JsonDecodingFailure and JsonDeserializationFailure should be removed
+// final class JsonParseFailureWrapped<Body> extends JsonApiFailure<Body> {
+//   JsonParseFailureWrapped(this.wrapped) : super(wrapped.message);
+
+//   final JsonParseFailure wrapped;
+// }
+
 /// A failure that occurs while decoding the response body as JSON.
 ///
 /// Indicates invalid or malformed JSON.

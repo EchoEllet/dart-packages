@@ -11,6 +11,7 @@ typedef JsonList = List<dynamic>;
 String jsonEncodePretty(JsonMap jsonMap) =>
     convert.JsonEncoder.withIndent(' ' * 2).convert(jsonMap);
 
+/// Type-safe wrapper over [convert.jsonEncode] that accepts a `Map` instead of `Object?`
 String jsonEncode(JsonMap json) => convert.jsonEncode(json);
 
 sealed class JsonParseFailure extends Failure {
