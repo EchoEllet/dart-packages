@@ -1,5 +1,6 @@
 enum HttpMethod {
   get(supportsRequestBody: false),
+  head(supportsRequestBody: false),
   post(supportsRequestBody: true),
   put(supportsRequestBody: true),
   patch(supportsRequestBody: true),
@@ -13,10 +14,11 @@ enum HttpMethod {
   // Hardcodes the name instead of using name.toUpperCase()
   // to prevent unintended breaking changes when renaming enums
   String get httpName => switch (this) {
-    HttpMethod.get => 'GET',
-    HttpMethod.post => 'POST',
-    HttpMethod.put => 'PUT',
-    HttpMethod.patch => 'PATCH',
-    HttpMethod.delete => 'DELETE',
+    .get => 'GET',
+    .head => 'HEAD',
+    .post => 'POST',
+    .put => 'PUT',
+    .patch => 'PATCH',
+    .delete => 'DELETE',
   };
 }

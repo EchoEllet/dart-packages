@@ -267,11 +267,12 @@ final class HttpApiClient implements ApiClient {
   /// that would couple the [HttpMethod] enum names to `package:http` implementation.
   /// Renaming an enum value could then introduce a regression.
   String _httpMethodAsString(HttpMethod method) => switch (method) {
-    HttpMethod.get => 'GET',
-    HttpMethod.post => 'POST',
-    HttpMethod.put => 'PUT',
-    HttpMethod.patch => 'PATCH',
-    HttpMethod.delete => 'DELETE',
+    .get => 'GET',
+    .head => 'HEAD',
+    .post => 'POST',
+    .put => 'PUT',
+    .patch => 'PATCH',
+    .delete => 'DELETE',
   };
 
   /// Maps exceptions thrown during the [_request] execution

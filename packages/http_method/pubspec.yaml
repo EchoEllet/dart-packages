@@ -3,7 +3,9 @@ description: |
   Minimal enum for common application HTTP methods (GET, POST, PUT, PATCH, DELETE).
   For API contracts and REST semantics, not full IANA method coverage.
 version: 0.0.1
-publish_to: 'none'
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/http_method
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20http_method
+topics: [http, network]
 
 environment:
   sdk: ^3.12.0
