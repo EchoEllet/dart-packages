@@ -2,7 +2,7 @@ name: http_method_enum
 description: |
   Minimal enum for common application HTTP methods (GET, HEAD, POST, PUT, PATCH, DELETE).
   For API contracts and REST semantics, not full IANA method coverage.
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/http_method_enum
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20http_method_enum
 topics: [http, network]
