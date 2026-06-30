@@ -21,3 +21,5 @@ pubspec.lock
 # Generated Flutter directory
 Flutter
 Runner/
+
+.idea/

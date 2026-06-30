@@ -9,13 +9,22 @@ environment:
 dependencies:
   result:
     path: ../result
-  json_utils:
-    path: ../json_utils
   http: ^1.4.0
   http_method:
     path: ../http_method
   meta: ^1.16.0
+  # TODO: Temporary, once api_client package is rewritten, it should depend on json_safe instead
+  json_utils:
+    git:
+      url: https://github.com/EchoEllet/dart-packages.git
+      ref: 570a0327c20ca5985e36c386ed6c63c59215e1bd
+      path: packages/json_utils
 
 dev_dependencies:
   test: ^1.24.0
   mocktail: ^1.0.4
+
+# TODO: Temporary, once json_utils is removed, this override should be removed as well
+dependency_overrides:
+  result:
+    path: ../result

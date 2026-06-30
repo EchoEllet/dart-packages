@@ -1,0 +1,13 @@
+name: json_safe
+description: "Safe JSON decoding & deserialization, JsonMap type, and pretty encoding"
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/json_safe
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20json_safe
+topics: [json, utils]
+
+environment:
+  sdk: ^3.12.0
+
+dev_dependencies:
+  meta: ^1.18.3
+  test: ^1.24.0
