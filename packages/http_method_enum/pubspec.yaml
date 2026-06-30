@@ -1,4 +1,4 @@
-name: http_method
+name: http_method_enum
 description: |
   Minimal enum for common application HTTP methods (GET, POST, PUT, PATCH, DELETE).
   For API contracts and REST semantics, not full IANA method coverage.

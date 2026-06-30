@@ -4,11 +4,11 @@ import 'package:api_client/src/multipart/multipart_body.dart'
     show MultipartBody;
 import 'package:api_client/src/request_body.dart';
 import 'package:http/http.dart' as http show MultipartFile;
-import 'package:http_method/http_method.dart';
+import 'package:http_method_enum/http_method_enum.dart';
 import 'package:json_utils/json_utils.dart';
 import 'package:result/result.dart';
 
-export 'package:http_method/http_method.dart' show HttpMethod;
+export 'package:http_method_enum/http_method_enum.dart' show HttpMethod;
 
 /// An HTTP client for APIs that return responses using the [Result] pattern.
 ///

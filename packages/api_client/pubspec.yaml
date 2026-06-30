@@ -10,8 +10,8 @@ dependencies:
   result:
     path: ../result
   http: ^1.4.0
-  http_method:
-    path: ../http_method
+  http_method_enum:
+    path: ../http_method_enum
   meta: ^1.16.0
   # TODO: Temporary, once api_client package is rewritten, it should depend on json_safe instead
   json_utils:
