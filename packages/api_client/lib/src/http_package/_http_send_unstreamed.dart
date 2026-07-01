@@ -8,17 +8,17 @@ import 'dart:convert' show Encoding;
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 
-/// Exposes the internal method `_sendUnstreamed` from `package:http`.
+/// Exposes the internal method `BaseClient._sendUnstreamed` from `package:http`.
 @internal
 extension SendUnstreamedInternal on Client {
-  /// Sends a non-streaming [Request] and returns a non-streaming [Response].
-  ///
   /// This method is a copy of the internal method from `package:http`:
-  /// https://github.com/dart-lang/http/blob/6656f15e88e68f6cafa2a7bbffa37fd6ac2dd33a/pkgs/http/lib/src/base_client.dart#L73-L94
+  /// [BaseClient._sendUnstreamed](https://github.com/dart-lang/http/blob/406ce749ba7897603a72186f083f0a00bb69356d/pkgs/http/lib/src/base_client.dart#L73-L94)
   //
   // Note for project maintainers: Keep this method as close as possible to the upstream version
   // to simplify comparison and future updates. Only formatting changes are allowed;
   // ignore lint warnings instead of modifying the code.
+  ///
+  /// Sends a non-streaming [Request] and returns a non-streaming [Response].
   @internal
   Future<Response> sendUnstreamed(
     String method,

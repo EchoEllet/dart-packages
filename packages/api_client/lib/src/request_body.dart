@@ -1,5 +1,5 @@
 import 'package:api_client/src/multipart/multipart_body.dart';
-import 'package:json_utils/json_utils.dart';
+import 'package:json_safe/json_safe.dart';
 import 'package:meta/meta.dart';
 
 /// Represents the body of an HTTP request.

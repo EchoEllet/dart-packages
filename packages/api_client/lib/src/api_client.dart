@@ -1,14 +1,21 @@
-import 'package:api_client/src/api_failures.dart';
 import 'package:api_client/src/http_response.dart';
+import 'package:api_client/src/http_status_result.dart';
 import 'package:api_client/src/multipart/multipart_body.dart'
     show MultipartBody;
 import 'package:api_client/src/request_body.dart';
 import 'package:http/http.dart' as http show MultipartFile;
 import 'package:http_method_enum/http_method_enum.dart';
-import 'package:json_utils/json_utils.dart';
-import 'package:result/result.dart';
+import 'package:json_safe/json_safe.dart' show JsonMap, JsonParseException;
 
 export 'package:http_method_enum/http_method_enum.dart' show HttpMethod;
+export 'package:json_safe/json_safe.dart'
+    show
+        JsonDecodingException,
+        JsonDeserializationException,
+        JsonObjectExpectedException,
+        JsonParseException;
+
+// TODO: Rename to HttpApiClient (also package name, rename the current HttpApiClient)
 
 /// An HTTP client for APIs that return responses using the [Result] pattern.
 ///
@@ -42,7 +49,7 @@ export 'package:http_method_enum/http_method_enum.dart' show HttpMethod;
 ///   method: HttpMethod.post,
 ///   body: RequestBody.json({'example': 'JSON'}),
 ///   deserializeSuccess: (response) => Example.fromJson(response.body),
-///   deserializeFailure: (response) => response.body['error_code']! as String,
+///   deserializeError: (response) => response.body['error_code']! as String,
 /// );
 /// ```
 ///
@@ -56,7 +63,8 @@ export 'package:http_method_enum/http_method_enum.dart' show HttpMethod;
 /// * The class [http.MultipartFile] from `package:http` is part of this API for
 ///   performance, simplicity, testability, and separation of concerns reasons.
 ///
-///   This makes replacing the `package:http` dependency slightly harder.
+///   This makes removing the `package:http` dependency slightly harder.
+///   However, that does not enforce the `http` client implementation (by dart.dev).
 ///   For more info, visit the file that exports [http.MultipartFile] which is
 ///   the same file that defines [MultipartBody].
 ///
@@ -73,21 +81,27 @@ abstract interface class ApiClient {
   /// If the API returns inconsistent responses (e.g., sometimes JSON, sometimes empty or non-JSON),
   /// use [request] instead for more control.
   ///
-  /// Use [deserializeSuccess] and [deserializeFailure] to parse the response body.
+  /// Use [deserializeSuccess] and [deserializeError] to parse the response body.
   /// Both receive the [HttpResponse] with the decoded JSON as a [JsonMap],
   /// suitable for passing to `fromJson`.
   ///
   /// - [deserializeSuccess] is used for 2xx responses.
-  /// - [deserializeFailure] is used for non-2xx responses (e.g., 4xx, 5xx).
+  /// - [deserializeError] is used for non-2xx responses (e.g., 4xx, 5xx).
+  ///
+  /// Throws [JsonParseException] if the response body:
+  ///
+  /// - is invalid or malformed JSON
+  /// - does not match the expected model structure or types
+  ///   - when either [deserializeSuccess] or [deserializeError] throws a [TypeError] (`json_serializable` generates code that throws this Dart error)
   ///
   /// {@macro requestCommon}
-  Future<JsonApiResult<S, F>> requestJson<S, F>(
+  Future<HttpStatusResult<S, E>> requestJson<S, E>(
     Uri url, {
     required HttpMethod method,
     Map<String, String>? headers,
     RequestBody? body,
     required JsonResponseDeserializer<S> deserializeSuccess,
-    required JsonResponseDeserializer<F> deserializeFailure,
+    required JsonResponseDeserializer<E> deserializeError,
   });
 
   /// Sends an HTTP request. For JSON support, consider [requestJson].
@@ -101,7 +115,7 @@ abstract interface class ApiClient {
   /// See also: [RequestBody]
   ///
   /// {@endtemplate}
-  Future<StringApiResult> request(
+  Future<HttpStatusResult<String, String>> request(
     Uri url, {
     required HttpMethod method,
     Map<String, String>? headers,
@@ -110,9 +124,3 @@ abstract interface class ApiClient {
 }
 
 typedef JsonResponseDeserializer<T> = T Function(JsonHttpResponse response);
-
-// S and F are usually parsed from the JSON response, but they can be anything.
-// S represents the success response.
-// F represents the error response.
-typedef JsonApiResult<S, F> = Result<HttpResponse<S>, ApiFailure<F>>;
-typedef StringApiResult = Result<StringHttpResponse, GeneralApiFailure<String>>;

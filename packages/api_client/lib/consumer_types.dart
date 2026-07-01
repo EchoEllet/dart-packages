@@ -12,4 +12,4 @@ export 'package:api_client/api_client.dart'
         HttpStatusRanges,
         MediaType,
         MultipartFile;
-export 'src/api_failures.dart';
+export 'src/http_status_result.dart';

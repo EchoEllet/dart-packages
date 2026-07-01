@@ -1,14 +1,16 @@
+@experimental
 @visibleForTesting
 library;
 
 import 'package:api_client/src/api_client.dart';
-import 'package:api_client/src/api_failures.dart' show ConnectionFailure;
+import 'package:api_client/src/http_status_result.dart';
 import 'package:api_client/src/request_body.dart';
 import 'package:api_client/src/test/http_response_dummy.dart';
-import 'package:json_utils/json_utils.dart';
+import 'package:json_safe/json_safe.dart';
 import 'package:meta/meta.dart';
-import 'package:result/result.dart';
 
+/// Experimental API and may be removed or changed in future versions.
+@experimental
 @visibleForTesting
 final class FakeApiClient implements ApiClient {
   final List<FakeHttpRequestCall> _requestCalls = [];
@@ -17,14 +19,14 @@ final class FakeApiClient implements ApiClient {
   int get requestCallCount => _requestCalls.length;
   int get requestJsonCallCount => _requestJsonCalls.length;
 
-  List<FakeHttpRequestCall> get requestCalls =>
-      List.unmodifiable(_requestCalls);
+  List<FakeHttpRequestCall> get requestCalls => .unmodifiable(_requestCalls);
   List<FakeHttpRequestJsonCall<Object, Object>> get requestJsonCalls =>
-      List.unmodifiable(_requestJsonCalls);
+      .unmodifiable(_requestJsonCalls);
 
-  Future<StringApiResult> Function(FakeHttpRequestCall call)? whenRequest;
-  Future<JsonApiResult<S, F>> Function<S, F>(
-    FakeHttpRequestJsonCall<S, F> call,
+  Future<HttpStatusResult<String, String>> Function(FakeHttpRequestCall call)?
+  whenRequest;
+  Future<HttpStatusResult<S, E>> Function<S, E>(
+    FakeHttpRequestJsonCall<S, E> call,
   )?
   whenRequestJson;
 
@@ -34,13 +36,13 @@ final class FakeApiClient implements ApiClient {
     required void Function(T result) assertion,
     required Future<void> Function() makeRequest,
   }) async {
-    whenRequestJson = <S, F>(call) async {
+    whenRequestJson = <S, E>(call) async {
       final result =
           call.deserializeSuccess(dummyJsonHttpResponse(body: json)) as T;
 
       assertion(result);
 
-      return Result.success(dummyHttpResponse(body: result as S));
+      return HttpStatusSuccess(dummyHttpResponse(body: result as S));
     };
 
     await makeRequest();
@@ -52,16 +54,13 @@ final class FakeApiClient implements ApiClient {
     required void Function(T result) assertion,
     required Future<void> Function() makeRequest,
   }) async {
-    whenRequestJson = <S, F>(call) async {
+    whenRequestJson = <S, E>(call) async {
       final result =
-          call.deserializeFailure(dummyJsonHttpResponse(body: json)) as T;
+          call.deserializeError(dummyJsonHttpResponse(body: json)) as T;
 
       assertion(result);
 
-      final dummyResult = JsonApiResult<S, F>.failure(
-        const ConnectionFailure('any'),
-      );
-      return dummyResult;
+      return HttpStatusError(dummyHttpResponse(body: result as E));
     };
 
     await makeRequest();
@@ -73,8 +72,8 @@ final class FakeApiClient implements ApiClient {
   //   required Future<JsonApiResult<T, Object>> Function() makeRequest,
   //   required void Function(T result) assertion,
   // }) async {
-  //   whenRequestJson = <S, F>(call) async {
-  //     return expectedResult as JsonApiResult<S, F>;
+  //   whenRequestJson = <S, E>(call) async {
+  //     return expectedResult as JsonApiResult<S, E>;
   //   };
 
   //   final result = await makeRequest();
@@ -83,7 +82,7 @@ final class FakeApiClient implements ApiClient {
   // }
 
   @override
-  Future<StringApiResult> request(
+  Future<HttpStatusResult<String, String>> request(
     Uri url, {
     required HttpMethod method,
     Map<String, String>? headers,
@@ -109,20 +108,20 @@ final class FakeApiClient implements ApiClient {
   }
 
   @override
-  Future<JsonApiResult<S, F>> requestJson<S, F>(
+  Future<HttpStatusResult<S, E>> requestJson<S, E>(
     Uri url, {
     required HttpMethod method,
     Map<String, String>? headers,
     RequestBody? body,
     required JsonResponseDeserializer<S> deserializeSuccess,
-    required JsonResponseDeserializer<F> deserializeFailure,
+    required JsonResponseDeserializer<E> deserializeError,
   }) {
-    final call = FakeHttpRequestJsonCall<S, F>(
+    final call = FakeHttpRequestJsonCall<S, E>(
       url: url,
       headers: headers,
       method: method,
       deserializeSuccess: deserializeSuccess,
-      deserializeFailure: deserializeFailure,
+      deserializeError: deserializeError,
       body: body,
     );
     _requestJsonCalls.add(call as FakeHttpRequestJsonCall<Object, Object>);
@@ -134,7 +133,7 @@ final class FakeApiClient implements ApiClient {
       );
     }
 
-    final result = whenRequestJson.call<S, F>(call);
+    final result = whenRequestJson.call<S, E>(call);
 
     return result;
   }
@@ -212,14 +211,14 @@ final class FakeHttpCall {
 }
 
 @visibleForTesting
-final class FakeHttpRequestJsonCall<S, F> {
+final class FakeHttpRequestJsonCall<S, E> {
   FakeHttpRequestJsonCall({
     required this.url,
     required this.headers,
     required this.method,
     required this.body,
     required this.deserializeSuccess,
-    required this.deserializeFailure,
+    required this.deserializeError,
   });
 
   final Uri url;
@@ -228,7 +227,7 @@ final class FakeHttpRequestJsonCall<S, F> {
 
   final RequestBody? body;
   final JsonResponseDeserializer<S> deserializeSuccess;
-  final JsonResponseDeserializer<F> deserializeFailure;
+  final JsonResponseDeserializer<E> deserializeError;
 }
 
 @visibleForTesting

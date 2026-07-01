@@ -1,32 +1,31 @@
-import 'dart:io' show SocketException;
-
 import 'package:api_client/src/api_client.dart';
-import 'package:api_client/src/api_failures.dart';
+import 'package:api_client/src/helpers/http_method_name.dart';
 import 'package:api_client/src/helpers/http_status_codes.dart'
     show HttpStatusRanges;
 import 'package:api_client/src/http_package/_http_send_unstreamed.dart';
 import 'package:api_client/src/http_response.dart';
+import 'package:api_client/src/http_status_result.dart';
 import 'package:api_client/src/multipart/multipart_body.dart'
     show MultipartBody;
 import 'package:api_client/src/request_body.dart';
 import 'package:http/http.dart' as http;
-import 'package:json_utils/json_utils.dart' as json;
-import 'package:result/result.dart';
+import 'package:json_safe/json_safe.dart' as json;
 
 /// An implementation of [ApiClient] backed by [`package:http`](https://pub.dev/packages/http).
 final class HttpApiClient implements ApiClient {
   HttpApiClient(this._client);
 
+  // See also: https://github.com/dart-lang/http/blob/6656f15e88e68f6cafa2a7bbffa37fd6ac2dd33a/pkgs/http/lib/src/io_client.dart#L22-L27
   final http.Client _client;
 
   @override
-  Future<JsonApiResult<S, F>> requestJson<S, F>(
+  Future<HttpStatusResult<S, E>> requestJson<S, E>(
     Uri url, {
     required HttpMethod method,
     Map<String, String>? headers,
     RequestBody? body,
     required JsonResponseDeserializer<S> deserializeSuccess,
-    required JsonResponseDeserializer<F> deserializeFailure,
+    required JsonResponseDeserializer<E> deserializeError,
   }) async {
     final result = await _request(
       url,
@@ -35,80 +34,24 @@ final class HttpApiClient implements ApiClient {
       body: body,
     );
 
-    switch (result) {
-      case SuccessResult<HttpResponse<String>, GeneralApiFailure<String>>():
-        final response = result.value;
-
-        final parseResult = json.tryJsonParse(
+    return result._mapBody<S, E>(
+      mapSuccess: (response) => response._mapBody(
+        json.deserializeJson(
           response.body,
           (json) => deserializeSuccess(response._mapBody(json)),
-        );
-
-        switch (parseResult) {
-          case SuccessResult<S, json.JsonParseFailure>():
-            return Result.success(response._mapBody(parseResult.value));
-          case FailureResult<S, json.JsonParseFailure>():
-            return Result.failure(
-              _mapJsonParseFailure(
-                parseResult.failure,
-                responseBody: response.body,
-              ),
-            );
-        }
-
-      case FailureResult<HttpResponse<String>, GeneralApiFailure<String>>():
-        final failure = result.failure;
-
-        switch (failure) {
-          case HttpStatusFailure<String>(:final response):
-            final responseBody = response.body;
-
-            // This block shares some JSON decoding and deserialization failure handling
-            // with the 2xx success case. While currently similar, the handling
-            // may diverge further in the future, so the duplication is intentional
-            // for clarity and separation of concerns.
-
-            final parseResult = json.tryJsonParse(
-              responseBody,
-              (json) => deserializeFailure(response._mapBody(json)),
-            );
-
-            final mappedFailure = switch (parseResult) {
-              SuccessResult<F, json.JsonParseFailure>(:final value) =>
-                failure.mapResponse((_) => value),
-              FailureResult<F, json.JsonParseFailure>() =>
-                _mapJsonParseFailure<F>(
-                  parseResult.failure,
-                  responseBody: responseBody,
-                ),
-            };
-            return Result.failure(mappedFailure);
-
-          case ConnectionFailure<String>():
-            return Result.failure(ConnectionFailure<F>(failure.message));
-
-          case UnexpectedFailure<String>():
-            return Result.failure(UnexpectedFailure<F>(failure.message));
-        }
-    }
+        ),
+      ),
+      mapError: (response) => response._mapBody(
+        json.deserializeJson(
+          response.body,
+          (json) => deserializeError(response._mapBody(json)),
+        ),
+      ),
+    );
   }
 
-  /// Maps a [json.JsonParseFailure] to a [JsonApiFailure],
-  /// which is specific to [requestJson].
-  JsonApiFailure<F> _mapJsonParseFailure<F>(
-    json.JsonParseFailure failure, {
-    required String responseBody,
-  }) => switch (failure) {
-    json.JsonDecodingFailure(:final reason) => JsonDecodingFailure<F>(
-      responseBody,
-      reason,
-    ),
-    json.JsonDeserializationFailure(:final decodedJson, :final reason) =>
-      JsonDeserializationFailure<F>(decodedJson, reason),
-  };
-
   @override
-  Future<StringApiResult> request(
+  Future<HttpStatusResult<String, String>> request(
     Uri url, {
     required HttpMethod method,
     Map<String, String>? headers,
@@ -118,7 +61,7 @@ final class HttpApiClient implements ApiClient {
   /// Performs an HTTP request for both multipart and regular bodies,
   /// encoding JSON if needed and mapping errors to [GeneralApiFailure].
   /// Used internally by [request] and [requestJson].
-  Future<StringApiResult> _request(
+  Future<HttpStatusResult<String, String>> _request(
     Uri url, {
     required HttpMethod method,
     required Map<String, String>? headers,
@@ -126,34 +69,34 @@ final class HttpApiClient implements ApiClient {
   }) async {
     _validateMethodSupportsRequestBody(method: method, body: body);
 
-    return _mapExceptionsToFailure(() async {
-      final HttpResponse<String> response;
+    final HttpResponse<String> response;
 
-      if (body case MultipartRequestBody(:final multipart)) {
-        // Sends a multipart request
+    if (body case MultipartRequestBody(:final multipart)) {
+      // Sends a multipart request
 
-        response = await _sendMultipartRequest(
-          method: method,
-          url: url,
-          body: multipart,
-          headers: headers,
-        );
-      } else {
-        // Sends a non-multipart request
+      response = await _sendMultipartRequest(
+        method: method,
+        url: url,
+        body: multipart,
+        headers: headers,
+      );
+    } else {
+      // Sends a non-multipart request
 
-        final (preparedBody, preparedHeaders) =
-            _encodeRequestBodyAsJsonIfNeeded(body: body, headers: headers);
+      final (preparedBody, preparedHeaders) = _encodeRequestBodyAsJsonIfNeeded(
+        body: body,
+        headers: headers,
+      );
 
-        response = await _sendRequest(
-          method: method,
-          url: url,
-          body: preparedBody,
-          headers: preparedHeaders,
-        );
-      }
+      response = await _sendRequest(
+        method: method,
+        url: url,
+        body: preparedBody,
+        headers: preparedHeaders,
+      );
+    }
 
-      return _mapResponseToResult(response);
-    });
+    return _mapResponseToStatusResult(response);
   }
 
   /// Encodes the request body as JSON and adds the `Content-Type: application/json` header
@@ -215,7 +158,7 @@ final class HttpApiClient implements ApiClient {
       throw ArgumentError.value(body, 'body', 'must not be a $RequestBody');
     }
 
-    final httpMethodString = _httpMethodAsString(method);
+    final httpMethodString = method.httpMethodName();
     final response = await _client.sendUnstreamed(
       httpMethodString,
       url,
@@ -242,7 +185,7 @@ final class HttpApiClient implements ApiClient {
     required MultipartBody body,
     required Map<String, String>? headers,
   }) async {
-    final httpMethodString = _httpMethodAsString(method);
+    final httpMethodString = method.httpMethodName();
     final multipartRequest = http.MultipartRequest(httpMethodString, url)
       ..fields.addAll(body.fields)
       ..files.addAll(body.files);
@@ -255,42 +198,6 @@ final class HttpApiClient implements ApiClient {
     final response = await http.Response.fromStream(streamedResponse);
 
     return _mapHttpResponse(response);
-  }
-
-  /// Returns the HTTP method name as a [String] that can be used
-  /// with [http.MultipartRequest] or [http.Request] from `package:http`.
-  ///
-  /// This matches the HTTP method names with internal `package:http` code:
-  /// https://github.com/dart-lang/http/blob/6656f15e88e68f6cafa2a7bbffa37fd6ac2dd33a/pkgs/http/lib/src/base_client.dart#L21-L47
-  //
-  /// We intentionally avoid using `method.name.toUpperCase()` because
-  /// that would couple the [HttpMethod] enum names to `package:http` implementation.
-  /// Renaming an enum value could then introduce a regression.
-  String _httpMethodAsString(HttpMethod method) => switch (method) {
-    .get => 'GET',
-    .head => 'HEAD',
-    .post => 'POST',
-    .put => 'PUT',
-    .patch => 'PATCH',
-    .delete => 'DELETE',
-  };
-
-  /// Maps exceptions thrown during the [_request] execution
-  /// into corresponding failure results.
-  ///
-  /// * Maps [SocketException] to [ConnectionFailure].
-  /// * Maps any other [Exception] to [UnexpectedFailure].
-  Future<Result<S, GeneralApiFailure<F>>> _mapExceptionsToFailure<S, F>(
-    Future<Result<S, GeneralApiFailure<F>>> Function() request,
-  ) async {
-    try {
-      return await request();
-    } on SocketException catch (e) {
-      // See also: https://github.com/dart-lang/http/blob/6656f15e88e68f6cafa2a7bbffa37fd6ac2dd33a/pkgs/http/lib/src/io_client.dart#L22-L27
-      return Result.failure(ConnectionFailure(e.toString()));
-    } on Exception catch (e) {
-      return Result.failure(UnexpectedFailure(e.toString()));
-    }
   }
 
   Map<String, String> _ensureJsonAcceptHeader(Map<String, String>? headers) => {
@@ -309,29 +216,30 @@ final class HttpApiClient implements ApiClient {
   /// by mapping to internal [_HttpResponse] to keep decoupling.
   _HttpResponse _mapHttpResponse(http.Response response) => _HttpResponse(
     statusCode: response.statusCode,
-    body: response.body,
+    body: response.body, // A computed getter, not a field.
     reasonPhrase: response.reasonPhrase,
     headers: response.headers,
   );
 
-  Result<HttpResponse<T>, GeneralApiFailure<T>> _mapResponseToResult<T>(
+  HttpStatusResult<T, T> _mapResponseToStatusResult<T>(
     HttpResponse<T> response,
   ) {
     if (HttpStatusRanges.isIn2xx(response.statusCode)) {
-      return Result.success(response);
+      return HttpStatusSuccess(response);
     }
 
-    return Result.failure(HttpStatusFailure(response: response));
+    return HttpStatusError(response);
   }
 }
 
 /// Decouples internal code from external types,
 /// handling differences between [http.Response] and [http.StreamedResponse].
 ///
-/// Used internally avoid depending on [http.Response] and [http.StreamedResponse].
+/// Used internally to avoid depending on [http.Response] and [http.StreamedResponse].
 typedef _HttpResponse = StringHttpResponse;
 
 extension _MapResponse<T> on HttpResponse<T> {
+  /// Returns a copy of this response with [newBody] replacing [body].
   HttpResponse<R> _mapBody<R>(R newBody) {
     return HttpResponse<R>(
       body: newBody,
@@ -342,12 +250,18 @@ extension _MapResponse<T> on HttpResponse<T> {
   }
 }
 
-extension _HttpStatusFailureMapper<T> on HttpStatusFailure<T> {
-  ApiFailure<R> mapResponse<R>(
-    R Function(HttpResponse<T> oldResponse) transform,
-  ) {
-    final newBody = transform(response);
-    final newResponse = response._mapBody<R>(newBody);
-    return HttpStatusFailure<R>(response: newResponse);
+extension _HttpStatusResult on HttpStatusResult<String, String> {
+  HttpStatusResult<S, E> _mapBody<S, E>({
+    required HttpResponse<S> Function(HttpResponse<String> response) mapSuccess,
+    required HttpResponse<E> Function(HttpResponse<String> response) mapError,
+  }) {
+    return switch (this) {
+      HttpStatusSuccess<String, String>(:final response) => HttpStatusSuccess(
+        mapSuccess(response),
+      ),
+      HttpStatusError<String, String>(:final response) => HttpStatusError(
+        mapError(response),
+      ),
+    };
   }
 }

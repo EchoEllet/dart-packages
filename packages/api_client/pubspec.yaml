@@ -1,30 +1,19 @@
 name: api_client
 description: "Enforces explicit failure handling for API calls."
-version: 1.0.0
-publish_to: 'none'
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/api_client
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20api_client
+topics: [http, network, api, client]
 
 environment:
   sdk: ^3.12.0
 
 dependencies:
-  result:
-    path: ../result
   http: ^1.4.0
-  http_method_enum:
-    path: ../http_method_enum
+  http_method_enum: ^0.0.1
   meta: ^1.16.0
-  # TODO: Temporary, once api_client package is rewritten, it should depend on json_safe instead
-  json_utils:
-    git:
-      url: https://github.com/EchoEllet/dart-packages.git
-      ref: 570a0327c20ca5985e36c386ed6c63c59215e1bd
-      path: packages/json_utils
+  json_safe: ^0.0.1
 
 dev_dependencies:
   test: ^1.24.0
   mocktail: ^1.0.4
-
-# TODO: Temporary, once json_utils is removed, this override should be removed as well
-dependency_overrides:
-  result:
-    path: ../result

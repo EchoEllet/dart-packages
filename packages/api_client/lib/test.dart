@@ -1,3 +1,5 @@
+/// Experimental testing API and may be removed or changed in future versions.
+@experimental
 @visibleForTesting
 library;
 

@@ -1,4 +1,5 @@
 import 'package:http/http.dart' show MultipartFile;
+import 'package:meta/meta.dart';
 
 // Why [MultipartFile] from the `package:http` is used as part of this API:
 //
@@ -19,6 +20,8 @@ import 'package:http/http.dart' show MultipartFile;
 //
 // For these reasons, exposing [MultipartFile] from the `http` package strikes the right balance
 // between abstraction, performance, and ease of use for file uploads.
+//
+// [MultipartFile] does not need to correspond to a physical file.
 export 'package:http/http.dart' show MultipartFile;
 
 // Required to allow consumers to create a [MultipartFile] with a content type set,
@@ -26,10 +29,11 @@ export 'package:http/http.dart' show MultipartFile;
 // ignore: depend_on_referenced_packages
 export 'package:http_parser/http_parser.dart' show MediaType;
 
+@immutable
 class MultipartBody {
-  MultipartBody({required this.fields, required this.files});
+  const MultipartBody({required this.fields, required this.files});
 
-  factory MultipartBody.empty() => MultipartBody(fields: {}, files: []);
+  factory MultipartBody.empty() => const MultipartBody(fields: {}, files: []);
 
   /// Key-value pairs for plain text fields.
   ///

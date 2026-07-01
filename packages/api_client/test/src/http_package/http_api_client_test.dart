@@ -2,9 +2,9 @@ import 'dart:convert' show utf8;
 import 'dart:io' show SocketException;
 
 import 'package:api_client/api_client.dart';
+import 'package:api_client/src/helpers/http_method_name.dart';
 import 'package:http/http.dart' as http;
-import 'package:json_utils/json_utils.dart'
-    show JsonMap, jsonDecodeOrThrow, jsonEncode;
+import 'package:json_safe/json_safe.dart';
 import 'package:meta/meta.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -135,7 +135,7 @@ void main() {
   });
 
   group('request', () {
-    Future<StringApiResult> request({
+    Future<HttpStatusResult<String, String>> request({
       Uri? url,
       HttpMethod? method,
       Map<String, String>? headers,
@@ -162,7 +162,7 @@ void main() {
     );
 
     test(
-      'returns $HttpResponse when a successful (2xx) response is received',
+      'returns $HttpStatusSuccess when a successful (2xx) response is received',
       () async {
         for (int statusCode = 200; statusCode < 300; statusCode++) {
           const responseBody = '<h1>Hello, World!</h1>';
@@ -180,18 +180,20 @@ void main() {
 
           final result = await request();
 
-          expect(result.failureOrNull, null);
+          expect(result.error, null);
 
-          expect(result.valueOrNull?.body, responseBody);
-          expect(result.valueOrNull?.statusCode, statusCode);
-          expect(result.valueOrNull?.reasonPhrase, reasonPhrase);
-          expect(result.valueOrNull?.headers, headers);
+          final response = result.success?.response;
+
+          expect(response?.body, responseBody);
+          expect(response?.statusCode, statusCode);
+          expect(response?.reasonPhrase, reasonPhrase);
+          expect(response?.headers, headers);
         }
       },
     );
 
     test(
-      'returns $HttpStatusFailure when an error (non-2xx) response is received',
+      'returns $HttpStatusError when an error (non-2xx) response is received',
       () async {
         for (int statusCode = 400; statusCode <= 500; statusCode++) {
           const responseBody = '<h1>Unknown example error</h1>';
@@ -209,14 +211,14 @@ void main() {
 
           final result = await request();
 
-          expect(result.valueOrNull, null);
+          expect(result.success, null);
+
+          final error = result.error;
+
+          expect(error, isA<HttpStatusError<String, _ErrorResponse>>());
           expect(
-            result.failureOrNull,
-            isA<HttpStatusFailure<_ErrorResponse>>(),
-          );
-          expect(
-            result.failureOrNull,
-            isA<HttpStatusFailure<_ErrorResponse>>().having(
+            error,
+            isA<HttpStatusError<String, _ErrorResponse>>().having(
               (e) => e.response.body,
               'responseBody',
               equals(responseBody),
@@ -225,8 +227,8 @@ void main() {
                 'Should provide the client error deserialized from the response body.',
           );
           expect(
-            result.failureOrNull,
-            isA<HttpStatusFailure<_ErrorResponse>>()
+            error,
+            isA<HttpStatusError<String, _ErrorResponse>>()
                 .having(
                   (e) => e.response.statusCode,
                   'statusCode',
@@ -247,14 +249,14 @@ void main() {
   });
 
   group('requestJson', () {
-    Future<JsonApiResult<S, F>> requestJson<S, F>({
+    Future<HttpStatusResult<S, E>> requestJson<S, E>({
       Uri? url,
       HttpMethod? method,
       Map<String, String>? headers,
       RequestBody? body,
       JsonResponseDeserializer<S>? deserializeSuccess,
-      JsonResponseDeserializer<F>? deserializeFailure,
-    }) => client.requestJson<S, F>(
+      JsonResponseDeserializer<E>? deserializeError,
+    }) => client.requestJson<S, E>(
       url ?? Uri(),
       method: method ?? _defaultTestMethod,
       headers: headers,
@@ -266,10 +268,10 @@ void main() {
         }
         return fn(response);
       },
-      deserializeFailure: (response) {
-        final fn = deserializeFailure;
+      deserializeError: (response) {
+        final fn = deserializeError;
         if (fn == null) {
-          return response.body as F;
+          return response.body as E;
         }
         return fn(response);
       },
@@ -282,7 +284,7 @@ void main() {
         method: method,
         headers: headers,
         deserializeSuccess: null,
-        deserializeFailure: null,
+        deserializeError: null,
       ),
     );
 
@@ -297,7 +299,7 @@ void main() {
 
     group('when a successful (2xx) response is received', () {
       test(
-        'returns $JsonDecodingFailure if the response body contains invalid JSON',
+        'throws $JsonDecodingException if the response body contains invalid JSON',
         () async {
           for (int statusCode = 200; statusCode < 300; statusCode++) {
             const responseBody = '<h1>Invalid JSON</h1>';
@@ -307,33 +309,27 @@ void main() {
                   _httpResponse(statusCode: statusCode, body: responseBody),
             );
 
-            final result = await requestJson<void, _ErrorResponse>();
-
-            expect(
-              result.failureOrNull,
-              isA<JsonDecodingFailure<_ErrorResponse>>(),
+            await expectLater(
+              requestJson<void, _ErrorResponse>(),
+              throwsA(isA<JsonDecodingException>()),
             );
-            expect(
-              result.failureOrNull,
-              isA<JsonDecodingFailure<_ErrorResponse>>()
-                  .having(
-                    (e) => e.responseBody,
-                    'responseBody',
-                    equals(responseBody),
-                  )
-                  .having(
-                    (e) => e.reason,
-                    'reason',
-                    equals('Unexpected character'),
-                  ),
-              reason: 'Should provide the reason with response body correctly',
+            await expectLater(
+              requestJson<void, _ErrorResponse>(),
+              throwsA(
+                isA<JsonDecodingException>().having(
+                  (e) => e.reason,
+                  'reason',
+                  equals('Unexpected character'),
+                ),
+              ),
+              reason: 'Should provide the reason correctly',
             );
           }
         },
       );
 
       test(
-        'returns $JsonDeserializationFailure if JSON deserialization fails',
+        'throws $JsonDeserializationException if JSON deserialization fails',
         () async {
           for (int statusCode = 200; statusCode < 300; statusCode++) {
             const expectedErrorReason =
@@ -346,29 +342,32 @@ void main() {
                   _httpResponse(statusCode: statusCode, body: responseBody),
             );
 
-            final result = await requestJson<void, _ErrorResponse>(
-              deserializeSuccess: (response) =>
-                  _FakeAccount.fromJson(response.body),
+            await expectLater(
+              requestJson<void, _ErrorResponse>(
+                deserializeSuccess: (response) =>
+                    _FakeAccount.fromJson(response.body),
+              ),
+              throwsA(isA<JsonDeserializationException>()),
             );
 
-            expect(
-              result.failureOrNull,
-              isA<JsonDeserializationFailure<_ErrorResponse>>(),
-            );
-
-            expect(
-              result.failureOrNull,
-              isA<JsonDeserializationFailure<_ErrorResponse>>()
-                  .having(
-                    (e) => e.decodedJson,
-                    'responseBody',
-                    equals(jsonDecodeOrThrow(responseBody)),
-                  )
-                  .having(
-                    (e) => e.reason,
-                    'reason',
-                    equals(expectedErrorReason),
-                  ),
+            await expectLater(
+              requestJson<void, _ErrorResponse>(
+                deserializeSuccess: (response) =>
+                    _FakeAccount.fromJson(response.body),
+              ),
+              throwsA(
+                isA<JsonDeserializationException>()
+                    .having(
+                      (e) => e.decodedJson,
+                      'responseBody',
+                      equals(decodeJsonStringToMap(responseBody)),
+                    )
+                    .having(
+                      (e) => e.reason,
+                      'reason',
+                      equals(expectedErrorReason),
+                    ),
+              ),
               reason: 'Should provide the reason and response body correctly',
             );
           }
@@ -376,7 +375,7 @@ void main() {
       );
 
       test(
-        'returns $HttpResponse with deserialized body if JSON deserialization succeeds',
+        'returns $HttpStatusSuccess with deserialized body if JSON deserialization succeeds',
         () async {
           for (int statusCode = 200; statusCode < 300; statusCode++) {
             const fakeAccount = _FakeAccount(id: 1, name: 'Steve');
@@ -399,12 +398,14 @@ void main() {
                   _FakeAccount.fromJson(response.body),
             );
 
-            expect(result.failureOrNull, null);
+            expect(result.error, null);
 
-            expect(result.valueOrNull?.body, fakeAccount);
-            expect(result.valueOrNull?.statusCode, statusCode);
-            expect(result.valueOrNull?.reasonPhrase, reasonPhrase);
-            expect(result.valueOrNull?.headers, headers);
+            final response = result.success?.response;
+
+            expect(response?.body, fakeAccount);
+            expect(response?.statusCode, statusCode);
+            expect(response?.reasonPhrase, reasonPhrase);
+            expect(response?.headers, headers);
           }
         },
       );
@@ -412,7 +413,7 @@ void main() {
 
     group('when an error (non-2xx) response is received', () {
       test(
-        'returns $JsonDecodingFailure if the response body contains invalid JSON',
+        'throws $JsonDecodingException if the response body contains invalid JSON',
         () async {
           for (int statusCode = 400; statusCode <= 500; statusCode++) {
             const responseBody = '<h1>Invalid JSON</h1>';
@@ -421,33 +422,27 @@ void main() {
                   _httpResponse(statusCode: statusCode, body: responseBody),
             );
 
-            final result = await requestJson<void, _ErrorResponse>();
-
-            expect(
-              result.failureOrNull,
-              isA<JsonDecodingFailure<_ErrorResponse>>(),
+            await expectLater(
+              requestJson<void, _ErrorResponse>(),
+              throwsA(isA<JsonDecodingException>()),
             );
-            expect(
-              result.failureOrNull,
-              isA<JsonDecodingFailure<_ErrorResponse>>()
-                  .having(
-                    (e) => e.responseBody,
-                    'responseBody',
-                    equals(responseBody),
-                  )
-                  .having(
-                    (e) => e.reason,
-                    'reason',
-                    equals('Unexpected character'),
-                  ),
-              reason: 'Should provide the reason with response body correctly',
+            await expectLater(
+              requestJson<void, _ErrorResponse>(),
+              throwsA(
+                isA<JsonDecodingException>().having(
+                  (e) => e.reason,
+                  'reason',
+                  equals('Unexpected character'),
+                ),
+              ),
+              reason: 'Should provide the reason correctly',
             );
           }
         },
       );
 
       test(
-        'returns $JsonDeserializationFailure if JSON deserialization fails',
+        'throws $JsonDeserializationException if JSON deserialization fails',
         () async {
           for (int statusCode = 400; statusCode <= 500; statusCode++) {
             const expectedErrorReason =
@@ -460,36 +455,39 @@ void main() {
                   _httpResponse(statusCode: statusCode, body: responseBody),
             );
 
-            final result = await requestJson<void, _ErrorResponse>(
-              deserializeFailure: (response) =>
-                  _FakeAccount.fromJson(response.body),
+            await expectLater(
+              requestJson<void, _ErrorResponse>(
+                deserializeError: (response) =>
+                    _FakeAccount.fromJson(response.body),
+              ),
+              throwsA(isA<JsonDeserializationException>()),
             );
 
-            expect(
-              result.failureOrNull,
-              isA<JsonDeserializationFailure<_ErrorResponse>>(),
-            );
-
-            expect(
-              result.failureOrNull,
-              isA<JsonDeserializationFailure<_ErrorResponse>>()
-                  .having(
-                    (e) => e.decodedJson,
-                    'responseBody',
-                    equals(jsonDecodeOrThrow(responseBody)),
-                  )
-                  .having(
-                    (e) => e.reason,
-                    'reason',
-                    equals(expectedErrorReason),
-                  ),
+            await expectLater(
+              requestJson<void, _ErrorResponse>(
+                deserializeError: (response) =>
+                    _FakeAccount.fromJson(response.body),
+              ),
+              throwsA(
+                isA<JsonDeserializationException>()
+                    .having(
+                      (e) => e.decodedJson,
+                      'responseBody',
+                      equals(decodeJsonStringToMap(responseBody)),
+                    )
+                    .having(
+                      (e) => e.reason,
+                      'reason',
+                      equals(expectedErrorReason),
+                    ),
+              ),
               reason: 'Should provide the reason and response body correctly',
             );
           }
         },
       );
 
-      test('returns $HttpStatusFailure if JSON deserialization succeeds', () async {
+      test('returns $HttpStatusError if JSON deserialization succeeds', () async {
         for (int statusCode = 400; statusCode <= 500; statusCode++) {
           const fakeAccount = _FakeAccount(id: 1, name: 'Steve');
 
@@ -507,18 +505,17 @@ void main() {
           mockSendRequest(() async => response);
 
           final result = await requestJson<void, _ErrorResponse>(
-            deserializeFailure: (response) =>
+            deserializeError: (response) =>
                 _FakeAccount.fromJson(response.body),
           );
 
-          expect(result.valueOrNull, null);
+          expect(result.success, null);
+
+          final error = result.error;
+          expect(error, isA<HttpStatusError<void, _ErrorResponse>>());
           expect(
-            result.failureOrNull,
-            isA<HttpStatusFailure<_ErrorResponse>>(),
-          );
-          expect(
-            result.failureOrNull,
-            isA<HttpStatusFailure<_ErrorResponse>>().having(
+            error,
+            isA<HttpStatusError<void, _ErrorResponse>>().having(
               (e) => e.response.body as _FakeAccount,
               'responseBody',
               equals(fakeAccount),
@@ -527,8 +524,8 @@ void main() {
                 'Should provide the client error deserialized from the response body.',
           );
           expect(
-            result.failureOrNull,
-            isA<HttpStatusFailure<_ErrorResponse>>()
+            error,
+            isA<HttpStatusError<void, _ErrorResponse>>()
                 .having(
                   (e) => e.response.statusCode,
                   'statusCode',
@@ -563,7 +560,7 @@ typedef _MockMakeHttpRequest =
     void Function(Future<_HttpResponse> Function() mock);
 
 typedef _CommonTestsMakeRequest =
-    Future<JsonApiResult<Object, _ErrorResponse>> Function({
+    Future<HttpStatusResult<Object, _ErrorResponse>> Function({
       Uri? url,
       Map<String, String>? headers,
       RequestBody? body,
@@ -589,25 +586,21 @@ void _commonTests({
   verifyRequestArguments,
   required void Function() verifyNoMoreClientInteractions,
 }) {
-  test('returns $ConnectionFailure on $SocketException', () async {
+  test('does not handle $SocketException', () async {
     mockMakeRequest(() async => throw const SocketException('any'));
 
-    final result = await sendRequest();
-
-    expect(result.failureOrNull, isA<ConnectionFailure<_ErrorResponse>>());
+    await expectLater(sendRequest(), throwsA(isA<SocketException>()));
   });
 
-  test('returns $UnexpectedFailure for unexpected cases correctly', () async {
+  test('does not handle $FormatException', () async {
     mockMakeRequest(() async => throw const FormatException());
 
-    final result = await sendRequest();
-
-    expect(result.failureOrNull, isA<UnexpectedFailure<_ErrorResponse>>());
+    await expectLater(sendRequest(), throwsA(isA<FormatException>()));
   });
 
   for (final method in HttpMethod.values._withNoRequestBodies()) {
     test(
-      'throws $ArgumentError when HTTP ${method.httpName} request is given a non-null body',
+      'throws $ArgumentError when HTTP ${method.httpMethodName()} request is given a non-null body',
       () async {
         await expectLater(
           sendRequest(body: const RequestBody.raw({}), method: method),

@@ -1,3 +1,7 @@
+// Copyright (c) 2013, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+//
 /// Provides standard HTTP status codes.
 ///
 /// Copied from `dart:io` to stay independent of `dart:io` and allow usage
@@ -65,11 +69,11 @@ abstract final class HttpStatusCodes {
   static const int loopDetected = 508;
   static const int notExtended = 510;
   static const int networkAuthenticationRequired = 511;
-  // Client generated status code.
+
+  /// Client generated status code.
   static const int networkConnectTimeoutError = 599;
 }
 
 abstract final class HttpStatusRanges {
-  static bool isIn5xx(int statusCode) => statusCode >= 500 && statusCode < 600;
   static bool isIn2xx(int statusCode) => statusCode >= 200 && statusCode < 300;
 }

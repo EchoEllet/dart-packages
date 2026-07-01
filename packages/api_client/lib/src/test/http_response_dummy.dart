@@ -1,8 +1,9 @@
+@experimental
 @visibleForTesting
 library;
 
 import 'package:api_client/src/http_response.dart';
-import 'package:json_utils/json_utils.dart';
+import 'package:json_safe/json_safe.dart';
 import 'package:meta/meta.dart';
 
 @visibleForTesting

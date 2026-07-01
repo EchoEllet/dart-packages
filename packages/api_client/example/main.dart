@@ -2,10 +2,9 @@
 
 import 'package:api_client/api_client.dart';
 import 'package:http/http.dart' as http;
-import 'package:json_utils/json_utils.dart';
+import 'package:json_safe/json_safe.dart';
 
 void main() async {
-  // Http package client
   final client = http.Client();
 
   try {
@@ -26,7 +25,7 @@ void main() async {
       body: const RequestBody.json({'username': 'User', 'password': '123'}),
       deserializeSuccess: (response) =>
           _HttpBinPostResponse.fromJson(response.body),
-      deserializeFailure: (response) => response.body,
+      deserializeError: (response) => response.body,
     );
 
     print('Result 2: $result2');
