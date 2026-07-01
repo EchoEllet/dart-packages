@@ -13,7 +13,7 @@ const _defaultTestMethod = HttpMethod.get;
 
 void main() {
   late _MockHttpClient mockHttpClient;
-  late HttpApiClient client;
+  late HttpApiClientDart client;
 
   /// Mocks the `Client.send` method from `package:http`.
   void mockSendRequest(Future<_HttpResponse> Function() getHttpResponse) {
@@ -124,7 +124,7 @@ void main() {
   setUp(() {
     mockHttpClient = _MockHttpClient();
 
-    client = HttpApiClient(mockHttpClient);
+    client = HttpApiClientDart(mockHttpClient);
 
     mockSendRequest(() async => _httpResponse(statusCode: 200));
   });
@@ -655,13 +655,13 @@ void _commonTests({
       test(
         'adds entries from the fields property of the body argument to the fields property of the ${http.MultipartRequest} passed to ${http.Client}.send()',
         () async {
-          final multipartBody = MultipartBody(
+          const multipartBody = MultipartBody(
             fields: {'variant': 'classic'},
             files: [],
           );
 
           await sendRequest(
-            body: RequestBody.multipart(multipartBody),
+            body: const RequestBody.multipart(multipartBody),
             method: method,
           );
 
@@ -676,7 +676,7 @@ void _commonTests({
         'to the files of the ${http.MultipartRequest} passed to ${http.Client}.send()',
         () async {
           final multipartBody = MultipartBody(
-            fields: {},
+            fields: const {},
             files: [MultipartFile.fromBytes('example', [])],
           );
 

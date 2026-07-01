@@ -1,3 +1,4 @@
+# TODO: Rename package to http_api_client once pub.dev team approves the request https://pub.dev/packages/http_api_client
 name: api_client
 description: "Enforces explicit failure handling for API calls."
 version: 0.0.1

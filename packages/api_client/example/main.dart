@@ -5,20 +5,20 @@ import 'package:http/http.dart' as http;
 import 'package:json_safe/json_safe.dart';
 
 void main() async {
-  final client = http.Client();
+  final httpClient = http.Client();
 
   try {
     // Use http package implementation
-    final ApiClient apiClient = HttpApiClient(client);
+    final HttpApiClient client = HttpApiClientDart(httpClient);
 
-    final result = await apiClient.request(
+    final result = await client.request(
       Uri.https('example.com'),
       method: HttpMethod.get,
     );
 
     print('Result 1: $result\n\n');
 
-    final result2 = await apiClient.requestJson(
+    final result2 = await client.requestJson(
       Uri.https('httpbin.org', 'post', {'name': 'test'}),
       method: HttpMethod.post,
       headers: {'Authorization': 'Bearer e_2323'},
@@ -30,7 +30,7 @@ void main() async {
 
     print('Result 2: $result2');
   } finally {
-    client.close();
+    httpClient.close();
   }
 }
 

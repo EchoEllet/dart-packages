@@ -2,7 +2,7 @@
 @visibleForTesting
 library;
 
-import 'package:api_client/src/api_client.dart';
+import 'package:api_client/src/http_api_client.dart';
 import 'package:api_client/src/http_status_result.dart';
 import 'package:api_client/src/request_body.dart';
 import 'package:api_client/src/test/http_response_dummy.dart';
@@ -12,7 +12,7 @@ import 'package:meta/meta.dart';
 /// Experimental API and may be removed or changed in future versions.
 @experimental
 @visibleForTesting
-final class FakeApiClient implements ApiClient {
+final class HttpApiClientFake implements HttpApiClient {
   final List<FakeHttpRequestCall> _requestCalls = [];
   final List<FakeHttpRequestJsonCall<Object, Object>> _requestJsonCalls = [];
 

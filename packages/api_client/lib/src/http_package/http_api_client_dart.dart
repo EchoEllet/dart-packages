@@ -1,7 +1,7 @@
-import 'package:api_client/src/api_client.dart';
 import 'package:api_client/src/helpers/http_method_name.dart';
 import 'package:api_client/src/helpers/http_status_codes.dart'
     show HttpStatusRanges;
+import 'package:api_client/src/http_api_client.dart';
 import 'package:api_client/src/http_package/_http_send_unstreamed.dart';
 import 'package:api_client/src/http_response.dart';
 import 'package:api_client/src/http_status_result.dart';
@@ -11,9 +11,9 @@ import 'package:api_client/src/request_body.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_safe/json_safe.dart' as json;
 
-/// An implementation of [ApiClient] backed by [`package:http`](https://pub.dev/packages/http).
-final class HttpApiClient implements ApiClient {
-  HttpApiClient(this._client);
+/// An implementation of [HttpApiClient] backed by [`package:http`](https://pub.dev/packages/http).
+final class HttpApiClientDart implements HttpApiClient {
+  HttpApiClientDart(this._client);
 
   // See also: https://github.com/dart-lang/http/blob/6656f15e88e68f6cafa2a7bbffa37fd6ac2dd33a/pkgs/http/lib/src/io_client.dart#L22-L27
   final http.Client _client;
@@ -118,7 +118,7 @@ final class HttpApiClient implements ApiClient {
         {...?headers, 'Content-Type': 'application/json'},
       ),
       MultipartRequestBody() => throw UnsupportedError(
-        'The internal method $HttpApiClient._encodeRequestBodyAsJsonIfNeeded() must '
+        'The internal method $HttpApiClientDart._encodeRequestBodyAsJsonIfNeeded() must '
         'not be called internally when the body argument is a $MultipartRequestBody. '
         'This utility function is not meant to be used for multipart requests.',
       ),

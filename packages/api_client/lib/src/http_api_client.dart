@@ -15,8 +15,6 @@ export 'package:json_safe/json_safe.dart'
         JsonObjectExpectedException,
         JsonParseException;
 
-// TODO: Rename to HttpApiClient (also package name, rename the current HttpApiClient)
-
 /// An HTTP client for APIs that return responses using the [Result] pattern.
 ///
 /// Provides the following on top of a standard HTTP client:
@@ -42,9 +40,9 @@ export 'package:json_safe/json_safe.dart'
 /// Example:
 ///
 /// ```dart
-/// final ApiClient apiClient = ...;
+/// final HttpApiClient client = HttpApiClientDart(...);
 ///
-/// final result = await apiClient.requestJson<Example, String>(
+/// final result = await client.requestJson<Example, String>(
 ///   Uri.https('api.example.com'),
 ///   method: HttpMethod.post,
 ///   body: RequestBody.json({'example': 'JSON'}),
@@ -72,7 +70,7 @@ export 'package:json_safe/json_safe.dart'
 ///   as API clients typically do not require it. Responses are always
 ///   returned as a raw [String] with [request], or as a decoded class
 ///   with [requestJson] rather than raw bytes.
-abstract interface class ApiClient {
+abstract interface class HttpApiClient {
   /// Sends an HTTP request and deserializes the JSON response.
   ///
   /// Unlike [request], this automatically adds the `Accept: application/json` header
