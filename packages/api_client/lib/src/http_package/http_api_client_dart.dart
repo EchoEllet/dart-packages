@@ -12,10 +12,20 @@ import 'package:http/http.dart' as http;
 import 'package:json_safe/json_safe.dart' as json;
 
 /// An implementation of [HttpApiClient] backed by [`package:http`](https://pub.dev/packages/http).
+///
+/// Consumers of this implementation may need to handle:
+///
+/// - [http.ClientException]
+///   - Or `SocketException` instead (not recommended). Refer the internal [`_ClientSocketException`](https://github.com/dart-lang/http/blob/6656f15e88e68f6cafa2a7bbffa37fd6ac2dd33a/pkgs/http/lib/src/io_client.dart#L22-L27) for details
+/// - [Exception] (as a fallback, for example in case of a `TlsException`)
+///
+/// In addition to [json.JsonParseException], which is required to handle
+/// when using [requestJson] for any implementation.
+///
+/// See also: [HttpApiClient]
 final class HttpApiClientDart implements HttpApiClient {
   HttpApiClientDart(this._client);
 
-  // See also: https://github.com/dart-lang/http/blob/6656f15e88e68f6cafa2a7bbffa37fd6ac2dd33a/pkgs/http/lib/src/io_client.dart#L22-L27
   final http.Client _client;
 
   @override
