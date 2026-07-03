@@ -8,4 +8,4 @@ example/windows/
 example/linux/
 example/test_driver/
 example/integration_test/
-test/
+example/analysis_options.yaml

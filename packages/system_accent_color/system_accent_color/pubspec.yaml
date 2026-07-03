@@ -1,7 +1,7 @@
 name: system_accent_color
 description: Retrieves the system's accent color
-version: 0.0.1
-repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/system_accent_color
+version: 0.0.2
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/system_accent_color/system_accent_color
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20system_accent_color
 topics: [system-accent-color, os-integration, dynamic-color, theming]
 
