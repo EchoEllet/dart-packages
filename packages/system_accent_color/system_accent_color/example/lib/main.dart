@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:system_accent_color/system_accent_color.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final accentColor = await SystemAccentColor().getAccentColor();
   print('Accent color: $accentColor');
 
@@ -26,14 +27,12 @@ class MainApp extends StatelessWidget {
           seedColor: seed,
           brightness: Brightness.light,
         ),
-        useMaterial3: true,
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: seed,
           brightness: Brightness.dark,
         ),
-        useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
       home: Home(accentColor: accentColor),

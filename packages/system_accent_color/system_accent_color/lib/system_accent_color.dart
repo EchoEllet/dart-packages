@@ -29,10 +29,11 @@ class SystemAccentColor {
   ///   Creates a temporary `div` with `background-color: AccentColor`,
   ///   reads its computed color, then removes the element.
   ///
+  ///   This is implemented on a best-effort basis. Browser support and behavior
+  ///   vary, and the returned color may be inaccurate or unavailable.
+  ///
   ///   Typically, browsers such as Google Chrome expose a browser-defined
   ///   accent color, unless the Flutter web app is installed as a PWA.
   ///
-  ///   This is implemented on a best-effort basis. Browser support and behavior
-  ///   vary, and the returned color may be inaccurate or unavailable.
   Future<Color?> getAccentColor() => _platform.getAccentColor();
 }
