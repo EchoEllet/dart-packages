@@ -14,14 +14,20 @@ typedef XdgDesktopPortalClientProvider = XdgDesktopPortalClient Function();
 ///
 /// If [_portalClientProvider] is non-null, the
 /// [XdgDesktopPortalClient] returned by the callback is **not closed** by this
-/// class. The caller is responsible for calling
+/// class, and the caller is responsible for calling
 /// [XdgDesktopPortalClient.close].
-class SystemAccentColorLinux(
-  final XdgDesktopPortalClientProvider? _portalClientProvider,
-) extends SystemAccentColorPlatform {
+class SystemAccentColorLinux extends SystemAccentColorPlatform {
+  SystemAccentColorLinux({
+    required XdgDesktopPortalClientProvider? portalClientProvider,
+  }) : _portalClientProvider = portalClientProvider;
+
+  final XdgDesktopPortalClientProvider? _portalClientProvider;
+
   /// Registers this class as the default instance of [SystemAccentColorPlatform].
   static void registerWith() {
-    SystemAccentColorPlatform.instance = SystemAccentColorLinux(null);
+    SystemAccentColorPlatform.instance = SystemAccentColorLinux(
+      portalClientProvider: null,
+    );
   }
 
   XdgDesktopPortalClient _createPortal() {
