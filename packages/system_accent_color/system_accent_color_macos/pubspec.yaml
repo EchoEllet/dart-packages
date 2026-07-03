@@ -1,0 +1,24 @@
+name: system_accent_color_macos
+description: macOS platform implementation of system_accent_color
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/system_accent_color_macos
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20system_accent_color
+topics: [system-accent-color, os-integration, dynamic-color, theming]
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  system_accent_color_platform_interface: ^0.0.1
+  objective_c: ^9.4.1
+
+dev_dependencies:
+  ffigen: ^20.1.1
+
+flutter:
+  plugin:
+    implements: system_accent_color
+    platforms:
+      macos:
+        dartPluginClass: SystemAccentColorMacOS
+        fileName: system_accent_color_macos.dart

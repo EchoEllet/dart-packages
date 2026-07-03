@@ -1,0 +1,23 @@
+name: system_accent_color_web
+description: Web platform implementation of system_accent_color
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/system_accent_color_web
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20system_accent_color
+topics: [system-accent-color, os-integration, dynamic-color, theming]
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  system_accent_color_platform_interface: ^0.0.1
+  flutter_web_plugins:
+    sdk: flutter
+  web: ^1.1.1
+
+flutter:
+  plugin:
+    implements: system_accent_color
+    platforms:
+      web:
+        pluginClass: SystemAccentColorWeb
+        fileName: system_accent_color_web.dart

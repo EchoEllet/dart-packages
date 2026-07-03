@@ -1,0 +1,21 @@
+name: system_accent_color_linux
+description: Linux platform implementation of system_accent_color
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/system_accent_color_linux
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20system_accent_color
+topics: [system-accent-color, os-integration, dynamic-color, theming]
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  system_accent_color_platform_interface: ^0.0.1
+  xdg_desktop_portal: ^0.1.14
+
+flutter:
+  plugin:
+    implements: system_accent_color
+    platforms:
+      linux:
+        dartPluginClass: SystemAccentColorLinux
+        fileName: system_accent_color_linux.dart

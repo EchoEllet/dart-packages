@@ -1,0 +1,35 @@
+name: system_accent_color
+description: Retrieves the system's accent color
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/system_accent_color
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20system_accent_color
+topics: [system-accent-color, os-integration, dynamic-color, theming]
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  system_accent_color_platform_interface: ^0.0.1
+  system_accent_color_linux: ^0.0.1
+  system_accent_color_windows: ^0.0.1
+  system_accent_color_macos: ^0.0.1
+  system_accent_color_android: ^0.0.1
+  system_accent_color_ios: ^0.0.1
+  system_accent_color_web: ^0.0.1
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        default_package: system_accent_color_android
+      ios:
+        default_package: system_accent_color_ios
+      macos:
+        default_package: system_accent_color_macos
+      web:
+        default_package: system_accent_color_web
+      windows:
+        default_package: system_accent_color_windows
+      linux:
+        default_package: system_accent_color_linux
+

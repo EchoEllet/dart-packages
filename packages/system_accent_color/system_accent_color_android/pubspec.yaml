@@ -1,0 +1,25 @@
+name: system_accent_color_android
+description: Android platform implementation of system_accent_color
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/system_accent_color_android
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20system_accent_color
+topics: [system-accent-color, os-integration, dynamic-color, theming]
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  system_accent_color_platform_interface: ^0.0.1
+  jni: ^1.0.0
+  jni_flutter: ^1.0.1
+
+dev_dependencies:
+  jnigen: ^0.16.0
+
+flutter:
+  plugin:
+    implements: system_accent_color
+    platforms:
+      android:
+        dartPluginClass: SystemAccentColorAndroid
+        fileName: system_accent_color_android.dart
