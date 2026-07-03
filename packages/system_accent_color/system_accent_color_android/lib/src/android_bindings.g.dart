@@ -1272,9 +1272,10 @@ extension type Context._(jni$_.JObject _$this) implements jni$_.JObject {
   /// The returned object must be released after use, by calling the [release] method.
   static jni$_.JString? get CONNECTIVITY_DIAGNOSTICS_SERVICE =>
       _id_CONNECTIVITY_DIAGNOSTICS_SERVICE.getNullable(
-        _class,
-        jni$_.JString.type,
-      ) as jni$_.JString?;
+            _class,
+            jni$_.JString.type,
+          )
+          as jni$_.JString?;
 
   static final _id_CONNECTIVITY_SERVICE = _class.staticFieldId(
     r'CONNECTIVITY_SERVICE',

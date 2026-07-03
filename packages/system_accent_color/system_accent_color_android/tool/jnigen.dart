@@ -14,7 +14,7 @@ void main(List<String> args) {
       ),
       androidSdkConfig: AndroidSdkConfig(
         addGradleDeps: true,
-        androidExample: '../../../librelab_flutter',
+        androidExample: '../system_accent_color/example',
       ),
       classes: [
         'android.util.TypedValue',
