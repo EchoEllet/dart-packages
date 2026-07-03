@@ -654,9 +654,11 @@ abstract final class ObjCBlock_NSString_ffiVoid {
   static ffi.Pointer<objc.ObjCObjectImpl> _closureTrampoline(
     ffi.Pointer<objc.ObjCBlockImpl> block,
     ffi.Pointer<ffi.Void> arg0,
-  ) => (objc.getBlockClosure(
-    block,
-  ) as ffi.Pointer<objc.ObjCObjectImpl> Function(ffi.Pointer<ffi.Void>))(arg0);
+  ) =>
+      (objc.getBlockClosure(block)
+          as ffi.Pointer<objc.ObjCObjectImpl> Function(ffi.Pointer<ffi.Void>))(
+        arg0,
+      );
   static ffi.Pointer<ffi.Void> _closureCallable =
       ffi.Pointer.fromFunction<
             ffi.Pointer<objc.ObjCObjectImpl> Function(

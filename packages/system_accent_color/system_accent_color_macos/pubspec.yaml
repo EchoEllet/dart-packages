@@ -12,6 +12,7 @@ environment:
 dependencies:
   system_accent_color_platform_interface: ^0.0.1
   objective_c: ^9.4.1
+  ffi: ^2.2.0
 
 dev_dependencies:
   ffigen: ^20.1.1
