@@ -7,10 +7,12 @@ topics: [system-accent-color, os-integration, dynamic-color, theming]
 
 environment:
   sdk: ^3.10.0
+  flutter: ">=3.38.0"
 
 dependencies:
   system_accent_color_platform_interface: ^0.0.1
   xdg_desktop_portal: ^0.1.14
+  dbus: ^0.7.11
 
 flutter:
   plugin:

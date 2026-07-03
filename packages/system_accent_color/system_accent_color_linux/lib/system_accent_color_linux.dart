@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-// ignore: depend_on_referenced_packages
 import 'package:dbus/dbus.dart' show DBusValue;
 import 'package:system_accent_color_platform_interface/system_accent_color_platform_interface.dart';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
