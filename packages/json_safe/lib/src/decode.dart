@@ -17,11 +17,15 @@ JsonMap decodeJsonStringToMap(String input) {
   try {
     final decoded = convert.jsonDecode(input);
     if (decoded is! JsonMap) {
-      throw JsonObjectExpectedException(decoded.runtimeType);
+      throw JsonObjectExpectedException(input, decoded.runtimeType);
     }
     return decoded;
   } on FormatException catch (e) {
-    throw JsonDecodingException(input, e.message);
+    throw JsonDecodingException(
+      source: input,
+      reason: e.message,
+      offset: e.offset,
+    );
   }
 }
 
@@ -67,7 +71,7 @@ T deserializeJsonMap<T>(
     // does not match the expected structure. This workaround catches those errors as failures.
     // ignore: avoid_catching_errors
   } on TypeError catch (e) {
-    throw JsonDeserializationException(map, e.toString());
+    throw JsonDeserializationException(decodedJson: map, reason: e.toString());
   }
 }
 
