@@ -7,6 +7,7 @@ Contains simple Dart/Flutter packages:
 - [`http_method_enum`](packages/http_method_enum)
 - [`json_safe`](packages/json_safe)
 - [`system_accent_color`](packages/system_accent_color)
+- [`dart_build_constants`](packages/dart_build_constants)
 
 > [!WARNING]
 > Any packages under [`packages`](packages) that are not listed in this README are considered internal packages and are prone to breaking changes (not published to `pub.dev` either).

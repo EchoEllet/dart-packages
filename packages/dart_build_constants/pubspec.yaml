@@ -1,0 +1,11 @@
+name: dart_build_constants
+description: |
+  Declares Flutter-compatible build constants without a Flutter dependency.
+  The constants are based on Dart's compile-time environment values.
+version: 1.0.0
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/dart_build_constants
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20dart_build_constants
+topics: [build, environment, constants]
+
+environment:
+  sdk: ^3.10.0
