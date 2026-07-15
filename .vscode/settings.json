@@ -1,8 +1,12 @@
 {
     "cSpell.words": [
+        "dbus",
         "Ellet",
         "endtemplate",
         "Flathub",
+        "Libsecret",
+        "sandboxed",
+        "sandboxing",
         "xcconfig",
         "xcprivacy"
     ]
