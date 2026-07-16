@@ -251,7 +251,15 @@ final applicationId = '<APPLICATION_ID>';
 
 final lookupAttributes = {
   'account': '$applicationId.secureStorage',
-  'xdg:schema': '*',
+  // Normally, 'xdg:schema' should be explicitly defined with a
+  // unique value. However, the current flutter_secure_storage_linux
+  // implementation stores an incorrect value due to a historical bug.
+  // It is omitted here to match existing data regardless of the stored
+  // value. This is not expected to be an issue since 'account' is
+  // already unique. Changing this would require data migration or a
+  // breaking change:
+  // https://github.com/juliansteenbakker/flutter_secure_storage/issues/1181
+  // 'xdg:schema': ...,
 };
 
 final secret = await client.lookupSecret(attributes: lookupAttributes);
@@ -368,7 +376,7 @@ More details in [this section](#xdgschema-attribute-optional).
 
 There are exceptional cases, such as migration from another implementation. In those cases, use the lookup attributes expected by that implementation.
 
-### For library authors: do not hardcode the application ID
+### For library authors: Allow overriding `FreeDesktopSecret`
 
 Prefer explicitly requiring a `FreeDesktopSecret` instance:
 
@@ -386,9 +394,39 @@ void example({FreeDesktopSecret? freeDesktopSecretClient}) {
 }
 ```
 
+### For library authors: do not hardcode the application ID
+
 Hardcoding an application ID or `xdg:schema` causes all applications using the same library to share the same namespace. This can lead to collisions, unintended access to another application's secrets, or force applications to choose a duplication strategy (see [Lookup duplication strategy](#lookup-duplication-strategy)).
 
 In fact, GNOME libsecret always uses a schema in normal usage.
+
+Consider this schema:
+
+```dart
+{
+  'xdg:schema': linuxApplicationId(), // e.g., via FFI or method channel
+  'package': 'flutter_secure_storage', // Example package name
+}
+```
+
+This approach allows a library to identify its own secrets within each application, while keeping different applications isolated from one another. It also makes it straightforward for application developers to migrate or access the library's secrets when needed, without risking collisions between unrelated applications or packages.
+
+Later, package authors can use this lookup to retrieve only the secrets created by their package:
+
+```dart
+{
+  'xdg:schema': linuxApplicationId(),
+  'package': 'flutter_secure_storage',
+}
+```
+
+Application developers can use this lookup to retrieve all secrets belonging to their application, regardless of the package:
+
+```dart
+{
+  'xdg:schema': linuxApplicationId(),
+}
+```
 
 ## Limitations
 
