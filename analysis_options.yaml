@@ -5,8 +5,6 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
-  exclude:
-    - '**/*.g.dart'
 
 # Based on https://github.com/flutter/packages/blob/main/analysis_options.yaml with modifications
 linter:
