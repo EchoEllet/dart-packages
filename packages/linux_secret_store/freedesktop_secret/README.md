@@ -81,7 +81,7 @@ print('Matching secrets: $secretCount');
 
 This package is **experimental** and not yet considered stable. The API may change before the first stable release (`1.0.0`).
 
-Integration tests against different Secret Service implementations are still being expanded, and real-world validation is ongoing.
+It has [integration tests](./integration_test/), but requires broader validation across different Secret Service implementations and more real-world usage.
 
 All breaking changes will be documented in `CHANGELOG.md`, regardless of the package's stability status.
 
@@ -231,6 +231,9 @@ Some packages may use a hardcoded schema name when using GNOME Libsecret on Linu
 > The lookup attributes shown above bellow internal implementation details of the respective plugins and may change over time. However, changing them is a breaking change.
 
 ### [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage)
+
+> [!NOTE]
+> There is [a pull request](https://github.com/juliansteenbakker/flutter_secure_storage/pull/1182) that updates `flutter_secure_storage_linux` to use `freedesktop_secret` for early testing.
 
 [`flutter_secure_storage_linux`](https://github.com/juliansteenbakker/flutter_secure_storage/tree/develop/flutter_secure_storage_linux/linux/include) stores all key-value pairs in a single item as JSON.
 
@@ -427,6 +430,9 @@ Application developers can use this lookup to retrieve all secrets belonging to 
   'xdg:schema': linuxApplicationId(),
 }
 ```
+
+> [!TIP]
+> The package [`linux_application_id`](https://pub.dev/packages/linux_application_id) provides synchronous access to the Linux application ID using Dart FFI.
 
 ## Limitations
 

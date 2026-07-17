@@ -1,13 +1,15 @@
 name: freedesktop_secret
 description: Dart client for the FreeDesktop Secret Service API (org.freedesktop.secrets) for storing secrets on Linux.
-version: 0.0.1-dev.2
+version: 0.0.1-dev.3
 repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/linux_secret_store/freedesktop_secret
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20freedesktop_secret
 topics: [os-integration, freedesktop, dbus]
 
 environment:
   sdk: ^3.10.0
-  flutter: ">=3.38.0"
 
 dependencies:
   dbus: ^0.7.14
+
+dev_dependencies:
+  test: ^1.31.2

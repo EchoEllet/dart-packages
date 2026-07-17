@@ -44,8 +44,10 @@ class FreeDesktopSecret {
   final WindowIdProvider _windowIdProvider;
 
   DBusClient? _cachedClient;
-  Future<DBusClient> get _client async =>
+  Future<DBusClient> get _ensureClient async =>
       _cachedClient ??= await _dbusClientProvider();
+  DBusClient get _clientOrThrow =>
+      _cachedClient ?? (throw StateError('Client is not initialized'));
 
   // Generated D-Bus proxy (internal implementation detail).
   OrgFreedesktopSecrets _remoteObject(
@@ -81,7 +83,7 @@ class FreeDesktopSecret {
     if (_sessionObjectPath != null) {
       return;
     }
-    final serviceObject = _remoteObject(await _client);
+    final serviceObject = _remoteObject(await _ensureClient);
 
     // "plain" refers only to the D-Bus session transfer algorithm. It does not
     // mean secrets are stored in plaintext. The Secret Service API recommends
@@ -156,7 +158,13 @@ class FreeDesktopSecret {
   ///
   /// Sensitive data must be stored in [secretBytes].
   ///
-  /// [replace] whether to replace an item with the same attributes or not.
+  /// [replace] controls whether an existing item with the same [attributes]
+  /// should be replaced instead of creating a new item.
+  ///
+  /// The Secret Service specification does not explicitly define whether the
+  /// existing item's [label] is updated when replacing an item. Tested Secret
+  /// Service implementations (KWallet) preserve the existing label
+  /// while updating the secret value.
   ///
   /// Exceptions:
   ///
@@ -184,14 +192,14 @@ class FreeDesktopSecret {
     required bool replace,
     DBusObjectPath? collection,
   }) async {
+    final client = _clientOrThrow;
+
     final collectionPath = collection ?? _defaultCollectionObjectPath;
     if (collectionPath == null) {
       throw const SecretServiceCollectionNotFoundException(
         alias: Constants.defaultAlias,
       );
     }
-
-    final client = await _client;
 
     final collectionObject = _remoteObject(client, path: collectionPath);
 
@@ -375,12 +383,12 @@ class FreeDesktopSecret {
     LookupSecretDuplicateStrategy duplicateStrategy = .throwException,
     DBusObjectPath? collection,
   }) async {
+    final client = _clientOrThrow;
+
     final collectionPath = collection ?? _defaultCollectionObjectPath;
     if (collectionPath == null) {
       return null;
     }
-
-    final client = await _client;
 
     final collectionObject = _remoteObject(client, path: collectionPath);
 
@@ -436,13 +444,15 @@ class FreeDesktopSecret {
       'org.freedesktop.Secret.Item',
     );
 
-    final itemAttributes = properties['Attributes']!.toStringStringMap();
+    final storedAttributes = properties['Attributes']!.toStringStringMap();
     final label = properties['Label']!.asString();
     final created = properties['Created']!.asUint64();
     final modified = properties['Modified']!.asUint64();
 
     return SecretItem(
-      attributes: itemAttributes,
+      // The stored attributes are not necessarily the same
+      // as the lookup attributes
+      attributes: storedAttributes,
       secretBytes: Uint8List.fromList(secretValue.secretBytes.toList()),
       contentType: secretValue.contentType,
       label: label,
@@ -458,6 +468,9 @@ class FreeDesktopSecret {
   }
 
   /// Deletes the secret matching [attributes].
+  ///
+  /// If multiple secrets match, [duplicateStrategy] determines how duplicates
+  /// are handled.
   ///
   /// If [collection] is omitted, the default collection is searched.
   ///
@@ -483,12 +496,12 @@ class FreeDesktopSecret {
         DeleteSecretDuplicateStrategy.throwException,
     DBusObjectPath? collection,
   }) async {
+    final client = _clientOrThrow;
+
     final collectionPath = collection ?? _defaultCollectionObjectPath;
     if (collectionPath == null) {
       return 0;
     }
-
-    final client = await _client;
 
     final collectionObject = _remoteObject(client, path: collectionPath);
 
@@ -564,12 +577,13 @@ class FreeDesktopSecret {
     required Map<String, String> attributes,
     DBusObjectPath? collection,
   }) async {
+    final client = _clientOrThrow;
+
     final collectionPath = collection ?? _defaultCollectionObjectPath;
     if (collectionPath == null) {
       return 0;
     }
 
-    final client = await _client;
     final collectionObject = _remoteObject(client, path: collectionPath);
 
     // Unlocking the collection is not required because this only searches item
@@ -607,11 +621,9 @@ class FreeDesktopSecret {
     if (sessionObjectPath == null) {
       return;
     }
-    final client =
-        _cachedClient ?? (throw StateError('DBus client is not initialized'));
 
     final sessionObject = _remoteObject(
-      client,
+      _clientOrThrow,
       path: sessionObjectPath, // The path returned from OpenSession()
     );
     await sessionObject.callClose();
@@ -619,8 +631,7 @@ class FreeDesktopSecret {
 
   /// Closes the Secret Service session and releases resources.
   ///
-  /// Call this when the instance is no longer needed, typically during
-  /// application shutdown.
+  /// Call this when the instance is no longer needed.
   ///
   /// The instance can be reused by calling [initialize] again.
   Future<void> close() async {
