@@ -1,3 +1,8 @@
+## 0.0.1-dev.4
+
+- Updates `freedesktop_secret.dart` to export `src/exceptions.dart`.
+- Adds Linux integration tests verifying interoperability with GNOME libsecret.
+
 ## 0.0.1-dev.3
 
 - Adds Linux integration tests against Secret Service implementations.

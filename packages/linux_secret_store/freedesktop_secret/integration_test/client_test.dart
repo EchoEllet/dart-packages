@@ -6,15 +6,9 @@ import 'dart:typed_data';
 
 import 'package:dbus/dbus.dart';
 import 'package:freedesktop_secret/freedesktop_secret.dart';
-import 'package:freedesktop_secret/src/exceptions.dart';
 import 'package:test/test.dart';
 
-/// Used to isolate the secrets created by this test suite.
-const baseAttributes = {'xdg:schema': 'com.example.integration-test'};
-
-Map<String, String> testAttributes([
-  Map<String, String> attributes = const {},
-]) => {...baseAttributes, ...attributes};
+import 'helpers.dart';
 
 /// Integration tests verifying the public behavior of the [FreeDesktopSecret]
 /// client against a real Secret Service implementation.
@@ -23,25 +17,13 @@ Map<String, String> testAttributes([
 ///
 /// Run with:
 ///   dart test integration_test/client_test.dart
+///
+/// Consider running `secret-tool lock` (provided by GNOME libsecret) before
+/// running the tests to verify the client implementation's prompt handling
+/// against a locked collection.
 void main() {
   late DBusClient dbusClient;
   late FreeDesktopSecret client;
-
-  Future<void> deleteAllTestSecrets({FreeDesktopSecret? overrideClient}) async {
-    final localClient = overrideClient ?? client;
-
-    final attrs = testAttributes();
-    await localClient.deleteSecret(
-      attributes: attrs,
-      duplicateStrategy: .deleteAll,
-    );
-
-    if (await localClient.countSecrets(attributes: attrs) != 0) {
-      fail(
-        'Previously stored secrets must be removed before running the tests',
-      );
-    }
-  }
 
   setUp(() async {
     dbusClient = DBusClient.session();
@@ -49,7 +31,7 @@ void main() {
 
     await client.initialize();
 
-    await deleteAllTestSecrets();
+    await deleteAllTestSecrets(client: client);
   });
 
   tearDown(() async {
@@ -62,7 +44,7 @@ void main() {
 
     try {
       await cleanupClient.initialize();
-      await deleteAllTestSecrets(overrideClient: cleanupClient);
+      await deleteAllTestSecrets(client: cleanupClient);
     } finally {
       await cleanupClient.close();
     }

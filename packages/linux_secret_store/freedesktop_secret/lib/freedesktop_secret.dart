@@ -3,17 +3,20 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dbus/dbus.dart';
-import 'package:freedesktop_secret/freedesktop_secret.dart';
 import 'package:freedesktop_secret/src/constants.dart';
 import 'package:freedesktop_secret/src/dbus_bindings.g.dart';
+import 'package:freedesktop_secret/src/duplicate_strategy/delete_secret_duplicate_strategy.dart';
+import 'package:freedesktop_secret/src/duplicate_strategy/lookup_secret_duplicate_strategy.dart';
 import 'package:freedesktop_secret/src/exceptions.dart';
 import 'package:freedesktop_secret/src/models/create_item_result.dart';
 import 'package:freedesktop_secret/src/models/open_session_result.dart';
+import 'package:freedesktop_secret/src/models/secret_item.dart';
 import 'package:freedesktop_secret/src/models/secret_value.dart';
 import 'package:freedesktop_secret/src/models/unlock_result.dart';
 
 export 'src/duplicate_strategy/delete_secret_duplicate_strategy.dart';
 export 'src/duplicate_strategy/lookup_secret_duplicate_strategy.dart';
+export 'src/exceptions.dart';
 export 'src/models/secret_item.dart';
 
 typedef DBusClientProvider = FutureOr<DBusClient> Function();
