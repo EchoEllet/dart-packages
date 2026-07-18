@@ -434,6 +434,46 @@ Application developers can use this lookup to retrieve all secrets belonging to 
 > [!TIP]
 > The package [`linux_application_id`](https://pub.dev/packages/linux_application_id) provides synchronous access to the Linux application ID using Dart FFI.
 
+### Handle thrown `Exception`s
+
+When performing operations such as storing or retrieving secrets, prefer catching `Exception`.
+
+Although many failures seem uncommon in practice, catching `Exception` ensures that both D-Bus exceptions (such as `DBusErrorException` and `DBusMethodResponseException`) and library-specific exceptions derived from `SecretServiceException` are handled.
+
+```dart
+try {
+  // Your operations here...
+} on Exception catch (e) {
+  ...
+}
+```
+
+If you are writing a library, consider avoiding patterns like this:
+
+```dart
+// Avoid this pattern when possible.
+
+try {
+  // Your operations here...
+  print('Succeeds');
+  return true;
+} catch (e) {
+  print('An error occurs: $e');
+  return false;
+}
+```
+
+This pattern has several limitations:
+
+- Catches programming errors that should typically be fixed rather than handled at runtime (for example, `ArgumentError`, `StateError`). There is a [Dart lint](https://dart.dev/tools/linter-rules/avoid_catching_errors) to avoid this.
+- Hardcodes a logging strategy, making it inconsistent with the application's chosen logging framework or telemetry.
+- Prevents applications from handling exceptions explicitly. For example, an application may want to display a specific message when a `SecretServicePromptDismissedException` is thrown, or recover when no Secret Service implementation or D-Bus session is available.
+- Silently converts failures into a return value that hides the original exception, stack trace, and other diagnostic information. This may prevent them from being reported by crash reporting tools such as Sentry if the exception is not handled.
+  - Applications can still map exceptions to `Result` failures according to their own error-handling requirements.
+
+> [!TIP]
+> This recommendation is **not specific** to `freedesktop_secret`. The same guidance generally applies when using libraries such as `dart:io`, `package:flutter_secure_storage`, and many other Dart and Flutter packages.
+
 ## Limitations
 
 ### Supports only plain algorithm for transferring secrets
@@ -460,15 +500,19 @@ GNOME Libsecret seems to support both plain and `dh-ietf1024-sha256-aes128-cbc-p
 
 ### Default collection usage
 
-The [specification suggests](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) that clients should use the default collection unless there are special requirements:
+According to the specification:
+
+> A group of items together form a collection. A collection is similar in concept to the terms 'keyring' or 'wallet'.
+
+The [specification suggests](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) that clients **should** use the **default collection** unless there are special requirements:
 
 > Client applications without special requirements should store in the default collection. The default collection is always accessible through a specific object path.
 
-The library uses the default collection by default. While individual operations can override the collection object path, the library currently does not expose APIs for creating or managing collections.
+The library uses the default collection by default. While individual operations can still override the collection object path (from raw `dbus`), the library currently does not expose or maintain convenient APIs for creating or managing collections.
 
-For most Flutter applications (for example, those using key/value pair storage), this limitation is not relevant.
+For most Flutter applications, this limitation is **not relevant**.
 
-Most packages store secrets in the default collection as well (`SECRET_COLLECTION_DEFAULT` in GNOME Libsecret):
+Most Flutter plugins and packages store secrets in the default collection as well (`SECRET_COLLECTION_DEFAULT` in GNOME Libsecret):
 
 - [`flutter_secure_storage_linux`](https://github.com/juliansteenbakker/flutter_secure_storage/blob/621195b91dd82d05fba6e297a8700c68a72ab031/flutter_secure_storage_linux/linux/include/Secret.hpp#L114-L115)
 - [`simple_secure_storage_linux`](https://github.com/Skyost/SimpleSecureStorage/blob/5940541cbb2a457a43735a6047434354c49bf77e/packages/simple_secure_storage_linux/linux/simple_secure_storage_linux_plugin.cc#L272)

@@ -1,3 +1,7 @@
+## 0.0.1-dev.5
+
+- Adds a new recommendation in README.
+
 ## 0.0.1-dev.4
 
 - Updates `freedesktop_secret.dart` to export `src/exceptions.dart`.
