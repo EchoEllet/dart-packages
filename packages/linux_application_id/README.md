@@ -20,6 +20,54 @@ print(linuxApplicationId());
 - The result is typically non-null with Flutter's default Linux embedder.
 - Throws `UnsupportedError` when called on a non-Linux platform (e.g., web, iOS).
 
+## Use case
+
+This library is useful for Dart-based Linux platform implementations, including Flutter plugins and Dart packages.
+
+For Flutter plugins, consider the following pattern:
+
+```dart
+import 'package:linux_application_id.dart/linux_application_id.dart';
+
+class SamplePluginLinux extends SamplePluginPlatform {
+  static void registerWith() {
+    SamplePluginPlatform.instance = SamplePluginLinux();
+  }
+
+  /// Overrides the Linux application ID.
+  ///
+  /// If null, the application ID of the running GLib `GApplication` is used.
+  ///
+  /// The application ID is used for <PLUGIN_USE_CASE>.
+  String? applicationIdOverride;
+
+  String get _applicationId =>
+      applicationIdOverride ??
+      linuxApplicationId() ??
+      (throw UnsupportedError(
+        'No Linux application ID is available. This must be called from a running Flutter Linux application.',
+      ));
+}
+```
+
+> [!NOTE]
+> Replace `<PLUGIN_USE_CASE>` with a description of how your plugin uses the application ID.
+
+Applications can optionally override it:
+
+```dart
+import 'package:sample_plugin_platform_interface/sample_plugin_platform_interface.dart';
+import 'package:sample_plugin_linux/sample_plugin_linux.dart';
+// ···
+
+final SamplePluginPlatform samplePluginImplementation = SamplePluginPlatform.instance;
+if (samplePluginImplementation is SamplePluginLinux) {
+  samplePluginImplementation.applicationIdOverride = 'com.example.legacy';
+}
+```
+
+This is similar to a pattern used by Flutter plugins maintained by the Flutter team (e.g., [`image_picker_android`](https://github.com/flutter/packages/blob/24a3833ea0c602a64154e99d4f1ee9b420c9c714/packages/image_picker/image_picker_android/lib/image_picker_android.dart#L19-L22) and its [README](https://github.com/flutter/packages/tree/24a3833ea0c602a64154e99d4f1ee9b420c9c714/packages/image_picker/image_picker_android#photo-picker)).
+
 ## Motivation
 
 ### Why not [`package_info_plus`](https://pub.dev/packages/package_info_plus)
@@ -35,7 +83,7 @@ This asset file can be modified or removed at runtime, and in rare cases may be 
 Relevant implementation reference: [`package_info_plus/package_info_plus_linux.dart`](https://github.com/fluttercommunity/plus_plugins/blob/f0da4b919cec0aaebbdc8daf8c4475e6bc0ae2ec/packages/package_info_plus/package_info_plus/lib/src/package_info_plus_linux.dart#L19-L45)
 
 These tradeoffs might be acceptable for applications. `linux_application_id`
-is useful for Linux platform implementations and Flutter plugins that need to keep transitive dependencies minimal and stable (e.g., [example use case](https://pub.dev/packages/freedesktop_secret#for-library-authors-do-not-hardcode-the-application-id)).
+is useful for Linux platform implementations and Flutter plugins that need to keep transitive dependencies minimal and stable (e.g., [example use case](https://pub.dev/packages/freedesktop_secret#for-library-authors-do-not-hardcode-the-application-id)). Its smaller scope makes it less prone to breaking changes.
 
 ### Why not read the `APPLICATION_ID` C macro
 

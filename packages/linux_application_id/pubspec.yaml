@@ -1,6 +1,6 @@
 name: linux_application_id
 description: Provides synchronous access to the current Linux application's ID using the GLib/GIO GApplication API. Works with Flutter's default Linux embedder.
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/linux_application_id
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20linux_application_id
 topics: [linux, os-integration, ffi]
