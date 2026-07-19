@@ -8,15 +8,14 @@ for storing and retrieving secrets through a Secret Service provider.
 
 On Linux, XDG is a set of specifications developed by [freedesktop.org](https://freedesktop.org/) to improve interoperability and provide shared technologies across desktop environments.
 
-This Dart package communicates with the freedesktop.org [Secret Service specification](https://specifications.freedesktop.org/secret-service/latest/) over D-Bus, making it compatible with any compliant Secret Service implementation (e.g., GNOME Keyring, KDE Wallet).
+This package communicates with the [Secret Service specification](https://specifications.freedesktop.org/secret-service/latest/) over D-Bus, making it compatible with any compliant Secret Service implementation (e.g., GNOME Keyring, KDE Wallet).
 
 ## Requirements
 
 These requirements are typically already satisfied by default on most Linux desktop environments.
 
-- A Linux operating system
-- A running Secret Service implementation (e.g., GNOME Keyring, KDE Wallet or another implementation of the `org.freedesktop.secrets` D-Bus service)
-- D-Bus support
+- A Linux operating system with D-Bus support.
+- A running Secret Service implementation (e.g., GNOME Keyring, KDE Wallet or another implementation of the `org.freedesktop.secrets` D-Bus service).
 
 > [!TIP]
 > While this package can read and write secrets stored by GNOME Libsecret since both use the same Secret Service backend ([more details](#migration-from-gnome-libsecret)), it does **not** require installing Libsecret packages (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
@@ -53,7 +52,7 @@ print('Stored secret');
 
 final secret = await client.lookupSecret(
   attributes: lookupAttributes,
-  duplicateStrategy: LookupSecretDuplicateStrategy.first,
+  duplicateStrategy: LookupSecretDuplicateStrategy.newestCreated,
 );
 
 print('Looked up secret: ${secret?.secretAsText()}');
@@ -76,6 +75,18 @@ print('Matching secrets: $secretCount');
 > Calling `client.close()` is typically not necessary.
 > The client can remain open for the application's lifetime and
 > will be cleaned up automatically when the application exits.
+
+## Verified Secret Service implementations
+
+This library is intended to work with Secret Service implementations that comply with the Freedesktop Secret Service specification. The following implementations have been verified through integration testing:
+
+- GNOME Keyring
+  - Fedora 44 (GNOME)
+  - Linux Mint 22 (Cinnamon)
+  - Pop!_OS 24.04 LTS (COSMIC)
+
+- KWallet
+  - CachyOS (KDE Plasma)
 
 ## Status
 
@@ -128,7 +139,7 @@ await client.deleteSecret(
 The default is `.throwException` to avoid silently returning or deleting an unexpected secret.
 
 > [!TIP]
-> According to [this source](https://git.cypherstack.com/Cypher_Stack/libsecret/src/commit/a773060332728385c09a0f1f436dabecfef802ae/docs/reference/libsecret/libsecret-c-examples.md#lookup-a-password), GNOME Libsecret handles duplicate matches by returning the most recently stored item.
+> According to the [GNOME Libsecret documentation](https://gnome.pages.gitlab.gnome.org/libsecret/libsecret-c-examples.html#lookup-a-password), GNOME Libsecret handles duplicate matches by returning the most recently stored item.
 
 > [!TIP]
 > When storing secrets, use `replace: true` to update an existing item with the same lookup attributes instead of creating duplicate items. However, duplicates may still occur, so lookup duplication handling is still required.

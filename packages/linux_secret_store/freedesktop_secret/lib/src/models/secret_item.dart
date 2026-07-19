@@ -19,7 +19,18 @@ final class SecretItem {
   final Uint8List secretBytes;
   final String contentType;
   final String label;
+
+  /// The time when the secret was created.
+  ///
+  /// {@template secret_service_timestamp_resolution}
+  /// Note: Secret Service timestamps have second resolution. Multiple items may
+  /// share the same timestamp.
+  /// {@endtemplate}
   final DateTime created;
+
+  /// The time when the secret was last modified.
+  ///
+  /// {@macro secret_service_timestamp_resolution}
   final DateTime modified;
 
   /// Decodes the secret bytes as UTF-8 text.

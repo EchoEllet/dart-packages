@@ -465,25 +465,63 @@ class FreeDesktopSecret {
       return null;
     }
 
-    DBusObjectPath resolveItemObjectPathFromSearch() {
-      if (searchResult.length > 1) {
-        switch (duplicateStrategy) {
-          case .throwException:
-            throw DuplicateSecretException(
-              attributes: attributes,
-              matchCount: searchResult.length,
-            );
-          case .first:
-            return searchResult.first;
-          case .last:
-            return searchResult.last;
-        }
+    Future<_ResolvedItem> resolveItem() async {
+      if (searchResult.length == 1) {
+        return _ResolvedItem(objectPath: searchResult.first);
       }
+      switch (duplicateStrategy) {
+        case .throwException:
+          throw DuplicateSecretException(
+            attributes: attributes,
+            matchCount: searchResult.length,
+          );
+        case .first:
+          return _ResolvedItem(objectPath: searchResult.first);
+        case .last:
+          return _ResolvedItem(objectPath: searchResult.last);
 
-      return searchResult.first;
+        // Timestamp-based strategies require fetching properties from every matching
+        // item before selecting one.
+        case .oldestCreated:
+        case .newestCreated:
+        case .oldestModified:
+        case .newestModified:
+          final candidates = <_ResolvedItem>[];
+
+          for (final objectPath in searchResult) {
+            final itemObject = _remoteObject(client, path: objectPath);
+
+            candidates.add(
+              _ResolvedItem(
+                objectPath: objectPath,
+                properties: await _getItemProperties(itemObject: itemObject),
+              ),
+            );
+          }
+
+          switch (duplicateStrategy) {
+            case .oldestCreated:
+              return candidates.oldestCreated();
+
+            case .newestCreated:
+              return candidates.newestCreated();
+
+            case .oldestModified:
+              return candidates.oldestModified();
+
+            case .newestModified:
+              return candidates.newestModified();
+
+            case .throwException:
+            case .first:
+            case .last:
+              throw StateError('Unreachable');
+          }
+      }
     }
 
-    final itemObjectPath = resolveItemObjectPathFromSearch();
+    final resolvedItem = await resolveItem();
+    final itemObjectPath = resolvedItem.objectPath;
     final itemObject = _remoteObject(client, path: itemObjectPath);
 
     await _ensureItemUnlocked(
@@ -496,11 +534,15 @@ class FreeDesktopSecret {
 
     final secretValue = SecretValue.fromDBus(rawResult);
 
-    final properties = await _getItemProperties(itemObject: itemObject);
+    // Timestamp-based strategies already fetched the properties while selecting
+    // the matching item. Reuse them instead of performing another D-Bus call.
+    final properties =
+        resolvedItem.properties ??
+        await _getItemProperties(itemObject: itemObject);
 
     return SecretItem(
-      // Note: Avoid returning "attributes", since the stored attributes are
-      // not necessarily the same as the lookup attributes.
+      // Note: Avoid passing the "attributes" argument. The lookup attributes
+      // are not necessarily the same as the stored attributes.
       attributes: properties.attributes,
       secretBytes: Uint8List.fromList(secretValue.secretBytes.toList()),
       contentType: secretValue.contentType,
@@ -563,27 +605,69 @@ class FreeDesktopSecret {
       return 0;
     }
 
-    List<DBusObjectPath> resolveItemObjectPathsFromSearch() {
-      if (searchResult.length > 1) {
-        switch (duplicateStrategy) {
-          case .throwException:
-            throw DuplicateSecretException(
-              attributes: attributes,
-              matchCount: searchResult.length,
-            );
-          case .first:
-            return [searchResult.first];
-          case .last:
-            return [searchResult.last];
-          case .deleteAll:
-            return searchResult;
-        }
+    Future<List<DBusObjectPath>> resolveItems() async {
+      if (searchResult.length == 1) {
+        return [searchResult.first];
       }
+      switch (duplicateStrategy) {
+        case .throwException:
+          throw DuplicateSecretException(
+            attributes: attributes,
+            matchCount: searchResult.length,
+          );
+        case .first:
+          return [searchResult.first];
+        case .last:
+          return [searchResult.last];
+        case .deleteAll:
+          return searchResult;
 
-      return [searchResult.first];
+        // Timestamp-based strategies require fetching properties from every matching
+        // item before selecting one.
+        case .oldestCreated:
+        case .newestCreated:
+        case .oldestModified:
+        case .newestModified:
+          final candidates = <_ResolvedItem>[];
+
+          for (final objectPath in searchResult) {
+            final itemObject = _remoteObject(client, path: objectPath);
+
+            candidates.add(
+              _ResolvedItem(
+                objectPath: objectPath,
+                properties: await _getItemProperties(itemObject: itemObject),
+              ),
+            );
+          }
+
+          late final _ResolvedItem resolvedItem;
+
+          switch (duplicateStrategy) {
+            case .oldestCreated:
+              resolvedItem = candidates.oldestCreated();
+
+            case .newestCreated:
+              resolvedItem = candidates.newestCreated();
+
+            case .oldestModified:
+              resolvedItem = candidates.oldestModified();
+
+            case .newestModified:
+              resolvedItem = candidates.newestModified();
+
+            case .throwException:
+            case .first:
+            case .last:
+            case .deleteAll:
+              throw StateError('Unreachable');
+          }
+
+          return [resolvedItem.objectPath];
+      }
     }
 
-    final itemObjectPaths = resolveItemObjectPathsFromSearch();
+    final itemObjectPaths = await resolveItems();
 
     for (final itemObjectPath in itemObjectPaths) {
       final itemObject = _remoteObject(client, path: itemObjectPath);
@@ -715,4 +799,31 @@ class FreeDesktopSecret {
     final properties = ItemProperties.fromDBus(rawProperties);
     return properties;
   }
+}
+
+final class _ResolvedItem {
+  const _ResolvedItem({required this.objectPath, this.properties});
+
+  final DBusObjectPath objectPath;
+  final ItemProperties? properties;
+}
+
+/// All methods in this extension require [_ResolvedItem.properties] to be
+/// non-null for every item in the list.
+extension on List<_ResolvedItem> {
+  _ResolvedItem oldestCreated() => reduce(
+    (a, b) => a.properties!.created.isBefore(b.properties!.created) ? a : b,
+  );
+
+  _ResolvedItem newestCreated() => reduce(
+    (a, b) => a.properties!.created.isAfter(b.properties!.created) ? a : b,
+  );
+
+  _ResolvedItem oldestModified() => reduce(
+    (a, b) => a.properties!.modified.isBefore(b.properties!.modified) ? a : b,
+  );
+
+  _ResolvedItem newestModified() => reduce(
+    (a, b) => a.properties!.modified.isAfter(b.properties!.modified) ? a : b,
+  );
 }

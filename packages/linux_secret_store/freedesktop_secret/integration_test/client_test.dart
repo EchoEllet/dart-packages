@@ -198,8 +198,6 @@ void main() {
     expect(newSecret, isNotNull);
     expect(newSecret!.secretAsText(), 'new-password');
 
-    // Not asserted intentionally.
-    //
     // Secret Service implementations tested so far (KWallet and libsecret via
     // `secret-tool`) preserve the original label when `replace` is true, even
     // though the secret value is updated. The specification does not explicitly
@@ -208,7 +206,7 @@ void main() {
     // However, the specification states:
     // > The service may ignore or change these properties when creating the item.
     //
-    // expect(newSecret.label, 'new label');
+    expect(newSecret.label, anyOf(equals('old label'), equals('new label')));
   });
 
   test('replace: false creates a new secret', () async {
@@ -230,6 +228,13 @@ void main() {
 
     expect(await countSecrets(attributes: attrs), 2);
 
+    // first and last are used without relying on their ordering because the order
+    // returned by SearchItems is service implementation-defined. The assertion
+    // only verifies that both the existing and newly created secrets are present.
+    //
+    // Timestamp-based strategies are not used here because this test does not verify
+    // timestamp ordering. Secret Service timestamps have second resolution, so
+    // distinct timestamps would require waiting between stores.
     final first = await lookupSecret(
       attributes: attrs,
       duplicateStrategy: .first,
@@ -240,15 +245,23 @@ void main() {
     );
 
     expect(first, isNotNull);
-    expect(first!.secretAsText(), 'new-password');
-    expect(first.label, 'new label');
-
     expect(last, isNotNull);
-    expect(last!.secretAsText(), 'old-password');
-    expect(last.label, 'old label');
+
+    final returnedSecrets = {
+      (first!.label, first.secretAsText()),
+      (last!.label, last.secretAsText()),
+    };
+
+    expect(
+      returnedSecrets,
+      containsAll([
+        ('old label', 'old-password'),
+        ('new label', 'new-password'),
+      ]),
+    );
   });
 
-  test('binary secrets are stored and retrieved unchanged', () async {
+  test('binary secret bytes are stored and retrieved unchanged', () async {
     final attrs = {'user': '@username'};
 
     await storeSecretBytes(
@@ -261,7 +274,17 @@ void main() {
 
     expect(secret, isNotNull);
     expect(secret!.secretBytes, orderedEquals([0, 1, 2, 127, 128, 254, 255]));
-    expect(secret.contentType, 'application/octet-stream');
+
+    // Secret Service implementations may normalize the stored content type.
+    // KWallet preserves "application/octet-stream", while GNOME Secret Service
+    // returns "text/plain".
+    expect(
+      secret.contentType,
+      anyOf(
+        equals('application/octet-stream'), // Preserved.
+        equals('text/plain'), // Normalized.
+      ),
+    );
   });
 
   test('textual secrets can be stored as bytes', () async {
@@ -468,15 +491,15 @@ void main() {
 
     await storeSecret(
       attributes: attrs,
-      secret: 'old',
-      label: 'Old',
+      secret: 'old-secret',
+      label: 'old-label',
       replace: false,
     );
 
     await storeSecret(
       attributes: attrs,
-      secret: 'new',
-      label: 'New',
+      secret: 'new-secret',
+      label: 'new-label',
       replace: false,
     );
 
@@ -486,14 +509,22 @@ void main() {
 
     expect(await countSecrets(attributes: attrs), 1);
 
-    final remaining = await lookupSecret(
-      attributes: attrs,
-      duplicateStrategy: .first,
-    );
+    final remaining = await lookupSecret(attributes: attrs);
 
     expect(remaining, isNotNull);
-    expect(remaining!.secretAsText(), 'old');
-    expect(remaining.label, 'Old');
+
+    // The ordering returned by SearchItems is service implementation-defined.
+    // This test therefore does not assume whether the first returned item is the
+    // oldest or newest matching secret, or follows any other ordering. It only
+    // verifies that one of the two stored secrets remains.
+    expect(
+      (remaining!.label, remaining.secretAsText()),
+      anyOf(
+        equals(('old-label', 'old-secret')),
+        equals(('new-label', 'new-secret')),
+      ),
+    );
+    expect(await countSecrets(attributes: attrs), 1);
   });
 
   test('deletes the last matching secret when specified', () async {
@@ -519,14 +550,19 @@ void main() {
 
     expect(await countSecrets(attributes: attrs), 1);
 
-    final remaining = await lookupSecret(
-      attributes: attrs,
-      duplicateStrategy: .first,
-    );
+    final remaining = await lookupSecret(attributes: attrs);
 
     expect(remaining, isNotNull);
-    expect(remaining!.secretAsText(), 'new');
-    expect(remaining.label, 'New');
+
+    // The ordering returned by SearchItems is service implementation-defined.
+    // This test therefore does not assume whether the last returned item is the
+    // oldest or newest matching secret, or follows any other ordering. It only
+    // verifies that one of the two stored secrets remains.
+    expect((
+      remaining!.label,
+      remaining.secretAsText(),
+    ), anyOf(equals(('Old', 'old')), equals(('New', 'new'))));
+    expect(await countSecrets(attributes: attrs), 1);
   });
 
   test(

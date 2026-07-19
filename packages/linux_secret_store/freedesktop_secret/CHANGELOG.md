@@ -1,6 +1,16 @@
 ## 0.0.1-dev.6
 
-- Updates doc comment of `LookupSecretDuplicateStrategy` and `DeleteSecretDuplicateStrategy` to indicate that the ordering of `first` and `last` is service implementation-defined and should **not** be relied upon.
+- Documents that `LookupSecretDuplicateStrategy.first` and `.last`, and `DeleteSecretDuplicateStrategy.first` and `.last`, depend on the ordering returned by the Secret Service implementation and should **not** be relied upon.
+- Adds timestamp-based duplicate strategies to `LookupSecretDuplicateStrategy` and `DeleteSecretDuplicateStrategy`:
+  - `oldestCreated`
+  - `newestCreated`
+  - `oldestModified`
+  - `newestModified`
+
+  Secret Service timestamps have second resolution. Timestamp-based duplicate strategies **cannot** distinguish between items with identical timestamps. This may affect automated integration tests that create multiple matching secrets within the same second.
+- **Note:** Consumers using exhaustive `switch` statements over `LookupSecretDuplicateStrategy` and/or `DeleteSecretDuplicateStrategy` may need to handle the new enum values.
+- Fixes false negatives in integration tests caused by service implementation differences on GNOME and Cinnamon.
+- Adds a "Verified Secret Service implementations" section to the README.
 
 ## 0.0.1-dev.5
 
