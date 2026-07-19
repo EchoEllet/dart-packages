@@ -9,12 +9,12 @@ final class SecretValue {
     required this.contentType,
   });
 
-  factory SecretValue.fromDBus(List<DBusValue> values) {
+  factory SecretValue.fromDBus(List<DBusValue> raw) {
     return SecretValue(
-      session: values[0].asObjectPath(),
-      parameters: values[1].asByteArray(),
-      secretBytes: values[2].asByteArray(),
-      contentType: values[3].asString(),
+      session: raw[0].asObjectPath(),
+      parameters: raw[1].asByteArray(),
+      secretBytes: raw[2].asByteArray(),
+      contentType: raw[3].asString(),
     );
   }
 

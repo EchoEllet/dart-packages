@@ -1,6 +1,7 @@
 ## 0.0.1-dev.5
 
 - Adds a new recommendation in README.
+- Deprecates `SecretServiceCollectionNotFoundException`. `FreeDesktopSecret.storeSecret()` now automatically creates the default collection when `collection` is omitted. For [more details](https://github.com/EchoEllet/dart-packages/issues/2).
 
 ## 0.0.1-dev.4
 

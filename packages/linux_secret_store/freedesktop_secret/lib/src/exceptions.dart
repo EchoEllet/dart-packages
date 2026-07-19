@@ -13,8 +13,18 @@ class SecretServiceSessionNegotiationException
       'The Secret Service implementation may not support the "$algorithm" algorithm.';
 }
 
+@Deprecated(
+  'No longer applicable: https://github.com/EchoEllet/dart-packages/issues/2\n'
+  'FreeDesktopSecret.storeSecret() now automatically creates the default '
+  'collection when the collection parameter is omitted.',
+)
 class SecretServiceCollectionNotFoundException
     implements SecretServiceException {
+  @Deprecated(
+    'No longer applicable: https://github.com/EchoEllet/dart-packages/issues/2\n'
+    'FreeDesktopSecret.storeSecret() now automatically creates the default '
+    'collection when the collection parameter is omitted.',
+  )
   const SecretServiceCollectionNotFoundException({required this.alias});
 
   final String alias;
@@ -91,4 +101,17 @@ class SecretServiceCreateItemResultException implements SecretServiceException {
       'after the prompt was completed with dismissed=false. '
       'The Secret Service implementation may have violated the specification '
       'or the item creation operation may not have been completed successfully.';
+}
+
+class SecretServiceCreateCollectionResultException
+    implements SecretServiceException {
+  const SecretServiceCreateCollectionResultException();
+
+  @override
+  String toString() =>
+      'SecretServiceCreateCollectionResultException: '
+      'The Secret Service CreateCollection operation returned no collection object path '
+      'after the prompt was completed with dismissed=false. '
+      'The Secret Service implementation may have violated the specification '
+      'or the collection creation operation may not have been completed successfully.';
 }

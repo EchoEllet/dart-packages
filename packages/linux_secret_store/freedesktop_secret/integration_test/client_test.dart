@@ -204,6 +204,7 @@ void main() {
     // `secret-tool`) preserve the original label when `replace` is true, even
     // though the secret value is updated. The specification does not explicitly
     // define whether the label should be replaced.
+    // However, stated: The service may ignore or change these properties when creating the item.
     //
     // expect(newSecret.label, 'new label');
   });
