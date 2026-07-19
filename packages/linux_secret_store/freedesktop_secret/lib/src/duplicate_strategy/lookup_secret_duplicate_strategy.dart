@@ -5,9 +5,11 @@ enum LookupSecretDuplicateStrategy {
   /// Throws [DuplicateSecretException].
   throwException,
 
-  /// Returns the first matching secret.
+  /// Returns the first item returned by SearchItems.
+  /// The ordering is service implementation-defined and should **not** be relied upon.
   first,
 
-  /// Returns the last matching secret.
+  /// Returns the last item returned by SearchItems.
+  /// The ordering is service implementation-defined and should **not** be relied upon.
   last,
 }

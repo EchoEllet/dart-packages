@@ -5,10 +5,12 @@ enum DeleteSecretDuplicateStrategy {
   /// Throws [DuplicateSecretException].
   throwException,
 
-  /// Deletes the first matching secret.
+  /// Deletes the first item returned by SearchItems.
+  /// The ordering is service implementation-defined and should **not** be relied upon.
   first,
 
-  /// Deletes the last matching secret.
+  /// Deletes the last item returned by SearchItems.
+  /// The ordering is service implementation-defined and should **not** be relied upon.
   last,
 
   /// Deletes all matching secrets.

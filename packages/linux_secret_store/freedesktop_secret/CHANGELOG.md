@@ -1,3 +1,7 @@
+## 0.0.1-dev.6
+
+- Updates doc comment of `LookupSecretDuplicateStrategy` and `DeleteSecretDuplicateStrategy` to indicate that the ordering of `first` and `last` is service implementation-defined and should **not** be relied upon.
+
 ## 0.0.1-dev.5
 
 - Adds a new recommendation in README.
