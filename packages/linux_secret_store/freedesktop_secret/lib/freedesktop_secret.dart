@@ -5,11 +5,13 @@ import 'dart:typed_data';
 import 'package:dbus/dbus.dart';
 import 'package:freedesktop_secret/src/constants.dart';
 import 'package:freedesktop_secret/src/dbus_bindings.g.dart';
+import 'package:freedesktop_secret/src/dbus_extensions.dart';
 import 'package:freedesktop_secret/src/duplicate_strategy/delete_secret_duplicate_strategy.dart';
 import 'package:freedesktop_secret/src/duplicate_strategy/lookup_secret_duplicate_strategy.dart';
 import 'package:freedesktop_secret/src/exceptions.dart';
 import 'package:freedesktop_secret/src/models/create_collection_result.dart';
 import 'package:freedesktop_secret/src/models/create_item_result.dart';
+import 'package:freedesktop_secret/src/models/item_properties.dart';
 import 'package:freedesktop_secret/src/models/open_session_result.dart';
 import 'package:freedesktop_secret/src/models/secret_item.dart';
 import 'package:freedesktop_secret/src/models/secret_value.dart';
@@ -494,32 +496,17 @@ class FreeDesktopSecret {
 
     final secretValue = SecretValue.fromDBus(rawResult);
 
-    // Gets all item properties in a single D-Bus call, including Label,
-    // Created, Modified, and Attributes.
-    final properties = await itemObject.getAllProperties(
-      'org.freedesktop.Secret.Item',
-    );
-
-    final storedAttributes = properties['Attributes']!.toStringStringMap();
-    final label = properties['Label']!.asString();
-    final created = properties['Created']!.asUint64();
-    final modified = properties['Modified']!.asUint64();
+    final properties = await _getItemProperties(itemObject: itemObject);
 
     return SecretItem(
-      // The stored attributes are not necessarily the same
-      // as the lookup attributes
-      attributes: storedAttributes,
+      // Note: Avoid returning "attributes", since the stored attributes are
+      // not necessarily the same as the lookup attributes.
+      attributes: properties.attributes,
       secretBytes: Uint8List.fromList(secretValue.secretBytes.toList()),
       contentType: secretValue.contentType,
-      label: label,
-      created: DateTime.fromMillisecondsSinceEpoch(
-        created * Duration.millisecondsPerSecond,
-        isUtc: true,
-      ),
-      modified: DateTime.fromMillisecondsSinceEpoch(
-        modified * Duration.millisecondsPerSecond,
-        isUtc: true,
-      ),
+      label: properties.label,
+      created: properties.created,
+      modified: properties.modified,
     );
   }
 
@@ -716,22 +703,16 @@ class FreeDesktopSecret {
   // https://specifications.freedesktop.org/secret-service/latest-single/#id-1.3.3.2.4.3.4.1
   Map<String, DBusValue> _createCollectionProperties({required String label}) =>
       {'org.freedesktop.Secret.Collection.Label': DBusString(label)};
-}
 
-extension on Map<String, String> {
-  DBusDict toDBusStringStringMap() {
-    return DBusDict(
-      DBusSignature('s'),
-      DBusSignature('s'),
-      map((key, value) => MapEntry(DBusString(key), DBusString(value))),
+  Future<ItemProperties> _getItemProperties({
+    required OrgFreedesktopSecrets itemObject,
+  }) async {
+    // Gets all item properties in a single D-Bus call, including Label,
+    // Created, Modified, and Attributes.
+    final rawProperties = await itemObject.getAllProperties(
+      'org.freedesktop.Secret.Item',
     );
-  }
-}
-
-extension on DBusValue {
-  Map<String, String> toStringStringMap() {
-    return asDict().map(
-      (key, value) => MapEntry(key.asString(), value.asString()),
-    );
+    final properties = ItemProperties.fromDBus(rawProperties);
+    return properties;
   }
 }
