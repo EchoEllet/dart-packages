@@ -140,6 +140,8 @@ The default is `.throwException` to avoid silently returning or deleting an unex
 
 > [!TIP]
 > According to the [GNOME Libsecret documentation](https://gnome.pages.gitlab.gnome.org/libsecret/libsecret-c-examples.html#lookup-a-password), GNOME Libsecret handles duplicate matches by returning the most recently stored item.
+>
+> Pass `.newestCreated` to the `duplicateStrategy` parameter if you want behavior similar to GNOME Libsecret, rather than relying on the service-defined ordering of `.first`.
 
 > [!TIP]
 > When storing secrets, use `replace: true` to update an existing item with the same lookup attributes instead of creating duplicate items. However, duplicates may still occur, so lookup duplication handling is still required.
@@ -299,6 +301,9 @@ set(APPLICATION_ID "...")
 
 ### [`simple_secure_storage`](https://pub.dev/packages/simple_secure_storage)
 
+> [!NOTE]
+> There is [a pull request](https://github.com/Skyost/SimpleSecureStorage/pull/15) that updates `simple_secure_storage_linux` to use `freedesktop_secret` for early testing.
+
 [`simple_secure_storage_linux` uses the schema `fr.skyost.SimpleSecureStorage` with `data` attribute](https://github.com/Skyost/SimpleSecureStorage/blob/5940541cbb2a457a43735a6047434354c49bf77e/packages/simple_secure_storage_linux/linux/simple_secure_storage_linux_plugin.cc#L25-L36):
 
 ```c
@@ -352,7 +357,7 @@ final lookupAttributes = {
 };
 ```
 
-### [dbus_secrets](https://pub.dev/packages/dbus_secrets)
+### [`dbus_secrets`](https://pub.dev/packages/dbus_secrets)
 
 `dbus_secrets` uses a simple [key-value lookup](https://github.com/akshaybabloo/dbus_secrets/blob/31da1752a3dd23bc82691f7a56d3239f6d63eadc/lib/dbus_secrets.dart#L227) and does not use GNOME Libsecret.
 
