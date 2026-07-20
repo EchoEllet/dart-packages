@@ -1,3 +1,9 @@
+## 0.1.0
+
+- Adds a new recommendation regarding the security model of `org.freedesktop.secrets` design.
+- Marks the transition from early development to the first public pre-1.0 release. The package is considered ready for general use, though the API may continue to evolve before `1.0.0`.
+- Documents `SecretServiceException` as the base type for library-defined exceptions and clarifies that D-Bus exceptions are propagated directly.
+
 ## 0.0.1-dev.6
 
 - Documents that `LookupSecretDuplicateStrategy.first` and `.last`, and `DeleteSecretDuplicateStrategy.first` and `.last`, depend on the ordering returned by the Secret Service implementation and should **not** be relied upon.

@@ -90,11 +90,11 @@ This library is intended to work with Secret Service implementations that comply
 
 ## Status
 
-This package is **experimental** and not yet considered stable. The API may change before the first stable release (`1.0.0`).
+This package is feature-complete for its intended scope and has been verified through [integration testing](./integration_test/) against multiple Secret Service implementations.
 
-It has [integration tests](./integration_test/), but requires broader validation across different Secret Service implementations and more real-world usage.
+However, the public API is not yet considered stable. Minor breaking API changes may still occur before the first stable (`1.0.0`) release as the API is refined based on real-world usage and feedback.
 
-All breaking changes will be documented in `CHANGELOG.md`, regardless of the package's stability status.
+All breaking changes will be documented in `CHANGELOG.md`.
 
 ## [Lookup attributes](https://specifications.freedesktop.org/secret-service/latest-single/#lookup-attributes)
 
@@ -484,6 +484,40 @@ This pattern has several limitations:
 
 > [!TIP]
 > This recommendation is **not specific** to `freedesktop_secret`. The same guidance generally applies when using libraries such as `dart:io`, `package:flutter_secure_storage`, and many other Dart and Flutter packages.
+
+### Secret Service security model
+
+The Secret Service specification does not define per-application access control. In practice, Secret Service implementations typically do not isolate applications running as the same user. This applies to GNOME Keyring and KWallet regardless of the client library used (such as GNOME libsecret or `freedesktop_secret`).
+
+See also: [this discussion](https://discuss.kde.org/t/kwallet-security-model-access-control-and-isolation/44925).
+
+**Provides:**
+
+- Encrypted storage of secrets at rest.
+- Protection against other Linux users accessing the user's secrets.
+- Protection against offline filesystem access (for example, copied disks or Windows dual-boot access).
+- Protection against physical device theft, provided the keyring remains protected.
+
+**Does not provide:**
+
+- Per-application access control defined by the Secret Service specification.
+- Protection against malicious software running as the same user.
+
+#### Portal security model
+
+The portal [`org.freedesktop.portal.Secret`](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html) is designed to provide a degree of isolation between sandboxed applications.
+
+It provides a master secret for a sandboxed application, which the application can use to encrypt and decrypt its own secrets stored on disk.
+
+In a typical backend implementation, the master secret is stored in the user's keyring under the application ID ([reference](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html#org-freedesktop-portal-secret-retrievesecret)).
+
+- Unsandboxed applications can still retrieve the master secret from the user's keyring and decrypt the secrets of sandboxed applications.
+- Sandboxed applications cannot retrieve the master secret of other applications unless they have D-Bus access to `org.freedesktop.secrets`. Even then, they would also need filesystem access to other Flatpak applications' data.
+  - Older Flathub submissions commonly requested `org.freedesktop.secrets` D-Bus access ([example](https://github.com/flathub/im.fluffychat.Fluffychat/blob/8a659a352fc7dd735324dee08521478fcca21357/im.fluffychat.Fluffychat.json#L18)). Newer submissions are generally encouraged to use the portal instead.
+
+#### Inform users about malicious or untrusted software
+
+Applications that store sensitive data should consider informing users about the risks of installing malicious or untrusted software. This recommendation applies regardless of whether the application is sandboxed or whether it uses the Secret portal.
 
 ## Limitations
 

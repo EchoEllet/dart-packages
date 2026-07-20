@@ -1,3 +1,7 @@
+/// The base exception type for exceptions thrown by this library.
+///
+/// All library-defined exceptions implement this type. Exceptions from
+/// `package:dbus` are not wrapped or converted and may be propagated directly.
 abstract interface class SecretServiceException implements Exception {}
 
 class SecretServiceSessionNegotiationException
