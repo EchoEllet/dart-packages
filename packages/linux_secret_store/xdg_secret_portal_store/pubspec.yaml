@@ -15,6 +15,7 @@ dependencies:
   cryptography: ^2.9.0
 
 dev_dependencies:
-  # Used in the example.
+  # Used in the example and integration tests.
   xdg_desktop_portal: ^0.1.13
   xdg_directories: ^1.1.0
+  test: ^1.31.2

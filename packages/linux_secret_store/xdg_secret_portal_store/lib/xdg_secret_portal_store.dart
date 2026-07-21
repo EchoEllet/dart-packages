@@ -71,10 +71,9 @@ class XdgSecretPortalStore {
 
   /// Encrypts and stores the provided secrets.
   Future<void> write(SecretMap map) async {
-    final encrypted = await _crypto.encrypt(
-      jsonEncode(map),
-      _masterSecretOrThrow,
-    );
+    final masterSecret = _masterSecretOrThrow;
+
+    final encrypted = await _crypto.encrypt(jsonEncode(map), masterSecret);
 
     await _persistence.write(encrypted);
   }
@@ -83,12 +82,14 @@ class XdgSecretPortalStore {
   ///
   /// Returns an empty map if no stored secrets exist.
   Future<SecretMap> read() async {
+    final masterSecret = _masterSecretOrThrow;
+
     final encrypted = await _persistence.read();
     if (encrypted == null) {
       return {};
     }
 
-    final plaintext = await _crypto.decrypt(encrypted, _masterSecretOrThrow);
+    final plaintext = await _crypto.decrypt(encrypted, masterSecret);
 
     return (jsonDecode(plaintext) as Map<String, dynamic>)
         .cast<String, String>();
