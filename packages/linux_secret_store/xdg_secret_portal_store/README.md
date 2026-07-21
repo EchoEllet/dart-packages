@@ -14,25 +14,25 @@ dart pub add xdg_secret_portal_store xdg_desktop_portal
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
 
-final portal = XdgDesktopPortalClient();
+final portalClient = XdgDesktopPortalClient();
 
-try {
-  final store = XdgSecretPortalStore(
-    secretRetriever: portal.secret.retrieveSecret,
-    persistence: SecretStorePersistenceFile(
-      // Read the "File Path" section for details.
-      File('/path/to/application/data/secrets.json'),
-    ),
-  );
+final store = XdgSecretPortalStore(
+  secretRetriever: portalClient.secret.retrieveSecret,
+  persistence: SecretStorePersistenceFile(
+    // Read the "File Path" section for details.
+    File('/path/to/application/data/secrets.json'),
+  ),
+);
 
-  await store.loadMasterSecret();
+await store.loadMasterSecret();
 
-  final Map<String, String> secrets = await store.read();
-  secrets['password'] = '123';
-  await store.write(secrets);
-} finally {
-  await portal.close();
-}
+final Map<String, String> secrets = await store.read();
+
+secrets['password'] = '123';
+await store.write(secrets);
+
+// Closes the client when no longer needed.
+await portalClient.close();
 ```
 
 > [!TIP]
