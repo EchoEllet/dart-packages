@@ -1,15 +1,19 @@
 {
     "cSpell.words": [
         "Cachy",
+        "ciphertext",
         "dbus",
         "Ellet",
         "endtemplate",
         "Flathub",
+        "hkdf",
+        "hmac",
         "Libsecret",
         "sandboxed",
         "sandboxing",
         "Unsandboxed",
         "xcconfig",
+        "Xchacha",
         "xcprivacy"
     ]
 }
