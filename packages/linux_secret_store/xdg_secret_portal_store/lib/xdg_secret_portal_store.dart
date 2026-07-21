@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:xdg_secret_portal_store/src/secret_store_crypto/default.dart';
 import 'package:xdg_secret_portal_store/src/secret_store_crypto/interface.dart';
-import 'package:xdg_secret_portal_store/src/secret_store_persistence/file.dart';
 import 'package:xdg_secret_portal_store/src/secret_store_persistence/interface.dart';
 
 export 'src/encrypted_secret_store.dart';
@@ -30,6 +29,7 @@ typedef SecretMap = Map<String, String>;
 ///
 /// final store = XdgSecretPortalStore(
 ///   secretRetriever: client.secret.retrieveSecret,
+///   persistence: SecretStorePersistenceFile(File(...)),
 /// );
 ///
 /// await store.loadMasterSecret();
@@ -44,9 +44,9 @@ typedef SecretMap = Map<String, String>;
 class XdgSecretPortalStore {
   XdgSecretPortalStore({
     required MasterSecretRetriever secretRetriever,
-    SecretStorePersistence? persistence,
+    required SecretStorePersistence persistence,
     SecretStoreCrypto? crypto,
-  }) : _persistence = persistence ?? SecretStorePersistenceFile(),
+  }) : _persistence = persistence,
        _secretRetriever = secretRetriever,
        _crypto = crypto ?? SecretStoreCryptoDefault();
 

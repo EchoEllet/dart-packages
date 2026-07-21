@@ -1,7 +1,6 @@
 import 'dart:convert' show jsonDecode, jsonEncode;
 import 'dart:io' show File;
 
-import 'package:xdg_directories/xdg_directories.dart';
 import 'package:xdg_secret_portal_store/src/encrypted_secret_store.dart';
 import 'package:xdg_secret_portal_store/src/secret_store_persistence/interface.dart';
 
@@ -9,12 +8,9 @@ import 'package:xdg_secret_portal_store/src/secret_store_persistence/interface.d
 ///
 /// Uses `$XDG_DATA_HOME/xdg_secret_portal_store/secrets.json` by default.
 class SecretStorePersistenceFile implements SecretStorePersistence {
-  SecretStorePersistenceFile([File? file]) : _file = file ?? _defaultFile;
+  SecretStorePersistenceFile(this._file);
 
   final File _file;
-
-  static File get _defaultFile =>
-      File('${dataHome.path}/xdg_secret_portal_store/secrets.json');
 
   @override
   Future<EncryptedSecretStore?> read() async {
