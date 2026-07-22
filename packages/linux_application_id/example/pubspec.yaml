@@ -1,0 +1,19 @@
+name: example
+description: "Demonstrates how to use the linux_application_id."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  linux_application_id:
+    path: ../
+
+dev_dependencies:
+  test: ^1.31.2
+
+flutter:
+  uses-material-design: true

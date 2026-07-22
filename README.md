@@ -10,6 +10,7 @@ Contains simple Dart/Flutter packages:
 - [`dart_build_constants`](packages/dart_build_constants)
 - [`freedesktop_secret`](packages/linux_secret_store/freedesktop_secret/)
 - [`xdg_secret_portal_store`](packages/linux_secret_store/xdg_secret_portal_store)
+- [`xdg_secret_portal_store_default`](packages/linux_secret_store/xdg_secret_portal_store_default)
 
 > [!WARNING]
 > Any packages under [`packages`](packages) that are not listed in this README are considered internal packages and are prone to breaking changes (not published to `pub.dev` either).

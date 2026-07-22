@@ -66,7 +66,16 @@ if (samplePluginImplementation is SamplePluginLinux) {
 }
 ```
 
-This is similar to a pattern used by Flutter plugins maintained by the Flutter team (e.g., [`image_picker_android`](https://github.com/flutter/packages/blob/24a3833ea0c602a64154e99d4f1ee9b420c9c714/packages/image_picker/image_picker_android/lib/image_picker_android.dart#L19-L22) and its [README](https://github.com/flutter/packages/tree/24a3833ea0c602a64154e99d4f1ee9b420c9c714/packages/image_picker/image_picker_android#photo-picker)).
+This is similar to a pattern used by some Flutter plugins (e.g., [`image_picker_android`](https://github.com/flutter/packages/blob/24a3833ea0c602a64154e99d4f1ee9b420c9c714/packages/image_picker/image_picker_android/lib/image_picker_android.dart#L19-L22) and its [README](https://github.com/flutter/packages/tree/24a3833ea0c602a64154e99d4f1ee9b420c9c714/packages/image_picker/image_picker_android#photo-picker)).
+
+> [!TIP]
+> Allowing consumers to override the application ID via `applicationIdOverride` not only supports custom Flutter Linux embedders and exceptional cases, but also enables integration tests to run directly in Dart (for FFI-based platform implementations that do not use method channels). This avoids building a native Linux application and starting a Flutter engine during testing, making integration tests significantly faster to run.
+
+## Runtime dependencies
+
+This package dynamically loads `libgio-2.0.so.0` using Dart FFI.
+
+This approach is similar to the [internal implementation used by `package:path_provider_linux`](https://github.com/flutter/packages/blob/af136ccab198bc7dfa25f5fa5ace23fdbcdaadc7/packages/path_provider/path_provider_linux/lib/src/get_application_id_real.dart#L23) for retrieving the application ID.
 
 ## Motivation
 
