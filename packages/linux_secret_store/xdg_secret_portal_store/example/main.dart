@@ -16,7 +16,7 @@ void main() async {
     );
 
     final store = XdgSecretPortalStore(
-      secretRetriever: portal.secret.retrieveSecret,
+      masterSecretRetriever: portal.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(file),
       crypto: SecretStoreCryptoDefault(),
     );

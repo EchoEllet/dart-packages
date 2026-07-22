@@ -32,7 +32,7 @@ void main() {
     required MasterSecretRetriever masterSecretRetriever,
     required SecretStorePersistence persistence,
   }) => XdgSecretPortalStore(
-    secretRetriever: client.secret.retrieveSecret,
+    masterSecretRetriever: client.secret.retrieveSecret,
     persistence: SecretStorePersistenceFile(storeFile),
     crypto: SecretStoreCryptoDefault(),
   );

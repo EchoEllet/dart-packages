@@ -18,7 +18,7 @@ import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.
 final portalClient = XdgDesktopPortalClient();
 
 final store = XdgSecretPortalStore(
-  secretRetriever: portalClient.secret.retrieveSecret,
+  masterSecretRetriever: portalClient.secret.retrieveSecret,
   persistence: SecretStorePersistenceFile(
     // Read the "File Path" section for details.
     File('/path/to/application/data/secrets.json'),

@@ -1,5 +1,7 @@
 ## 0.2.0
 
+- **BREAKING CHANGE**: Renames `XdgSecretPortalStore.secretRetriever` to `XdgSecretPortalStore.masterSecretRetriever`.
+
 - **BREAKING CHANGE**: Moves the default cryptographic implementation to the new [`xdg_secret_portal_store_default`](http://pub.dev/packages/xdg_secret_portal_store_default) package. `xdg_secret_portal_store` no longer depends on [`package:cryptography`](https://pub.dev/packages/cryptography) and now requires a `SecretStoreCrypto` implementation to be supplied explicitly.
 
 ### Migration

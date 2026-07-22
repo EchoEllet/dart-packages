@@ -27,7 +27,7 @@ typedef SecretMap = Map<String, String>;
 /// final client = XdgDesktopPortalClient();
 ///
 /// final store = XdgSecretPortalStore(
-///   secretRetriever: client.secret.retrieveSecret,
+///   masterSecretRetriever: client.secret.retrieveSecret,
 ///   persistence: SecretStorePersistenceFile(File(...)),
 ///   crypto: ...,
 /// );
@@ -43,14 +43,14 @@ typedef SecretMap = Map<String, String>;
 /// Call [loadMasterSecret] before using [read] or [write].
 class XdgSecretPortalStore {
   XdgSecretPortalStore({
-    required MasterSecretRetriever secretRetriever,
+    required MasterSecretRetriever masterSecretRetriever,
     required SecretStorePersistence persistence,
     required SecretStoreCrypto crypto,
   }) : _persistence = persistence,
-       _secretRetriever = secretRetriever,
+       _masterSecretRetriever = masterSecretRetriever,
        _crypto = crypto;
 
-  final MasterSecretRetriever _secretRetriever;
+  final MasterSecretRetriever _masterSecretRetriever;
   final SecretStorePersistence _persistence;
   final SecretStoreCrypto _crypto;
 
@@ -66,7 +66,7 @@ class XdgSecretPortalStore {
   ///
   /// Must be called before using [read] or [write].
   Future<void> loadMasterSecret() async {
-    _masterSecret = await _secretRetriever();
+    _masterSecret = await _masterSecretRetriever();
   }
 
   /// Encrypts and stores the provided secrets.
