@@ -5,7 +5,7 @@ complement [`package:xdg_desktop_portal`](https://pub.dev/packages/xdg_desktop_p
 To add the dependencies:
 
 ```shell
-dart pub add xdg_secret_portal_store xdg_desktop_portal
+dart pub add xdg_secret_portal_store xdg_secret_portal_store_default xdg_desktop_portal
 ```
 
 ## Usage
@@ -13,6 +13,7 @@ dart pub add xdg_secret_portal_store xdg_desktop_portal
 ```dart
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
+import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart' show SecretStoreCryptoDefault;
 
 final portalClient = XdgDesktopPortalClient();
 
@@ -22,6 +23,8 @@ final store = XdgSecretPortalStore(
     // Read the "File Path" section for details.
     File('/path/to/application/data/secrets.json'),
   ),
+  // Read the "Cryptography" section for details.
+  crypto: SecretStoreCryptoDefault(),
 );
 
 await store.loadMasterSecret();
@@ -50,26 +53,24 @@ await portalClient.close();
 
 ## Cryptography
 
-The [Secret Portal specification](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html#org-freedesktop-portal-secret-retrievesecret) states:
+This package does not provide a default cryptographic implementation. A `SecretStoreCrypto` implementation must be supplied, either by using [`package:xdg_secret_portal_store_default`](https://pub.dev/packages/xdg_secret_portal_store_default#cryptography) or by providing a custom implementation.
 
-> The master secret can be used for encrypting confidential data, but its format
-> is opaque to the application. In particular, the length of the secret might
-> not be sufficient for use with certain encryption algorithms. In that case,
-> the application is supposed to expand it using a KDF algorithm.
+The cryptographic implementation and its security considerations are documented in the README of `package:xdg_secret_portal_store_default`.
 
-The default implementation of this package:
+> [!NOTE]
+> When a custom implementation is used, the consumer
+is responsible for compatibility and migrations. `xdg_secret_portal_store` and
+its companion package cannot assume the implementation details.
 
-- derives a 32-byte encryption key using **HKDF-SHA-256** with
-  `xdg_secret_portal_store` as the HKDF `info` value.
-- uses **XChaCha20-Poly1305** for authenticated encryption of the secret store.
+### Custom implementation
 
-The cryptographic operations are implemented using
-[`package:cryptography`](https://pub.dev/packages/cryptography).
+In this case, `package:xdg_secret_portal_store_default` is not required.
 
-Additionally, `SecretStoreCrypto` can be implemented to provide a custom crypto
-implementation (which can be independent of `package:cryptography`):
+To use a different crypto library or a different algorithm:
 
 ```dart
+import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
+
 class SecretStoreCryptoCustom implements SecretStoreCrypto {
   // ...
 }
@@ -82,6 +83,9 @@ final store = XdgSecretPortalStore(
   crypto: SecretStoreCryptoCustom(),
 );
 ```
+
+> [!TIP]
+> Consumers are strongly encouraged to read the [Secret Portal specification](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html#org-freedesktop-portal-secret-retrievesecret).
 
 ## Storage format
 
@@ -174,12 +178,6 @@ $XDG_DATA_HOME/keyrings/<default-collection>.keyring
 
 If GNOME libsecret is using the Secret Service backend, this package is also not interoperable. However,
 [`package:freedesktop_secret`](https://pub.dev/packages/freedesktop_secret) is interoperable with GNOME libsecret when using that backend.
-
-## Disclaimer
-
-Support for this library is given as _best effort_.
-
-This library has not been reviewed or vetted by security professionals.
 
 ## See also
 

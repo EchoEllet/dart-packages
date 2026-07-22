@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
-import 'package:xdg_secret_portal_store/src/encrypted_secret_store.dart';
-import 'package:xdg_secret_portal_store/src/secret_store_crypto/interface.dart';
+import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
 
 /// Default [SecretStoreCrypto] implementation using HKDF-SHA-256 and
 /// XChaCha20-Poly1305.

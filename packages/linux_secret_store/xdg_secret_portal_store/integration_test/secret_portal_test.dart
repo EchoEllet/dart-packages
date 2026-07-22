@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 import 'package:xdg_directories/xdg_directories.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
+import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
 /// Integration tests verifying the public behavior of the
 /// [XdgSecretPortalStore] against a real Secret Portal implementation.
@@ -27,6 +28,15 @@ void main() {
   late XdgDesktopPortalClient client;
   late XdgSecretPortalStore store;
 
+  XdgSecretPortalStore createStore({
+    required MasterSecretRetriever masterSecretRetriever,
+    required SecretStorePersistence persistence,
+  }) => XdgSecretPortalStore(
+    secretRetriever: client.secret.retrieveSecret,
+    persistence: SecretStorePersistenceFile(storeFile),
+    crypto: SecretStoreCryptoDefault(),
+  );
+
   setUp(() async {
     storeFile = File(
       '${dataHome.path}/org.example.xdg_secret_portal_store_example/xdg_secret_portal_store/secrets.json',
@@ -35,8 +45,8 @@ void main() {
     await deleteStoreFile();
 
     client = XdgDesktopPortalClient();
-    store = XdgSecretPortalStore(
-      secretRetriever: client.secret.retrieveSecret,
+    store = createStore(
+      masterSecretRetriever: client.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(storeFile),
     );
 
@@ -74,8 +84,8 @@ void main() {
   test('persists secrets across store instances', () async {
     await store.write({'password': '123'});
 
-    final anotherStore = XdgSecretPortalStore(
-      secretRetriever: client.secret.retrieveSecret,
+    final anotherStore = createStore(
+      masterSecretRetriever: client.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(storeFile),
     );
 
@@ -131,8 +141,8 @@ void main() {
     final client = XdgDesktopPortalClient();
     addTearDown(client.close);
 
-    final store = XdgSecretPortalStore(
-      secretRetriever: client.secret.retrieveSecret,
+    final store = createStore(
+      masterSecretRetriever: client.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(storeFile),
     );
 

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 import 'package:xdg_directories/xdg_directories.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
+import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
 void main() async {
   final portal = XdgDesktopPortalClient();
@@ -17,6 +18,7 @@ void main() async {
     final store = XdgSecretPortalStore(
       secretRetriever: portal.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(file),
+      crypto: SecretStoreCryptoDefault(),
     );
     await store.loadMasterSecret();
 
