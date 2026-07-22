@@ -8,7 +8,21 @@ for storing and retrieving secrets through a Secret Service provider.
 
 On Linux, XDG is a set of specifications developed by [freedesktop.org](https://freedesktop.org/) to improve interoperability and provide shared technologies across desktop environments.
 
-This package communicates with the [Secret Service specification](https://specifications.freedesktop.org/secret-service/latest/) over D-Bus, making it compatible with any compliant Secret Service implementation (e.g., GNOME Keyring, KDE Wallet).
+This package communicates with the [Secret Service API](https://specifications.freedesktop.org/secret-service/latest/) over D-Bus, making it compatible with any compliant Secret Service implementation (e.g., GNOME Keyring, KDE Wallet).
+
+> [!TIP]
+> This package is focused on the Secret Service API (`org.freedesktop.secrets`).
+>
+> The [Secret Portal](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html) (`org.freedesktop.portal.Secret`) is a separate API with different semantics and requirements, including client-side encryption. For applications targeting the Secret Portal, see [`package:xdg_secret_portal_store`](https://pub.dev/packages/xdg_secret_portal_store).
+
+## Features
+
+- Pure Dart implementation using D-Bus directly.
+- Does not require additional system packages to build or run the application (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
+- Uses the standard Secret Service API, which is the primary API used by GNOME Libsecret, making it possible to retain compatibility without data migration ([more details](#migration-from-gnome-libsecret)).
+- Handles prompts, unlocking the default collection ([also known](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) as a keyring or wallet) and items when needed.
+- Automatically creates the default collection when it does not exist (e.g., on fresh Linux installations).
+- Provides convenience strategies for handling duplicate matches during lookup and deletion.
 
 ## Requirements
 
@@ -16,14 +30,6 @@ These requirements are typically already satisfied by default on most Linux desk
 
 - A Linux operating system with D-Bus support.
 - A running Secret Service implementation (e.g., GNOME Keyring, KDE Wallet or another implementation of the `org.freedesktop.secrets` D-Bus service).
-
-> [!TIP]
-> While this package can read and write secrets stored by GNOME Libsecret since both use the same Secret Service backend ([more details](#migration-from-gnome-libsecret)), it does **not** require installing Libsecret packages (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
-
-> [!IMPORTANT]
-> This package intentionally does not support [`org.freedesktop.portal.Secret`](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html). It is a different backend with different semantics, dependencies, error handling, and requires the client to encrypt secrets before storing them.
-> 
-> Instead, a separate package named `freedesktop_secret_portal` is planned. A higher-level package may later provide a unified API over both backends, hiding their implementation differences.
 
 ## Usage
 
@@ -35,7 +41,7 @@ import 'package:freedesktop_secret/freedesktop_secret.dart';
 final client = FreeDesktopSecret();
 await client.initialize();
 
-// Replace '<APPLICATION_ID>' with your Linux application ID.
+// Replace '<APPLICATION_ID>' with the Linux application ID.
 const lookupAttributes = {
   'xdg:schema': '<APPLICATION_ID>',
   'key': 'refresh_token_example_key',
@@ -96,15 +102,15 @@ However, the public API is not yet considered stable. Minor breaking API changes
 
 All breaking changes will be documented in `CHANGELOG.md`.
 
-## [Lookup attributes](https://specifications.freedesktop.org/secret-service/latest-single/#lookup-attributes)
+## Lookup attributes
 
-Lookup attributes identify a stored secret and are used to retrieve or delete it later. Services implementing this API will probably store attributes in an **unencrypted** manner in order to support simple and efficient lookups.
+[Lookup attributes](https://specifications.freedesktop.org/secret-service/latest-single/#lookup-attributes) identify a stored secret and are used to retrieve or delete it later. Services implementing this API will probably store attributes in an **unencrypted** manner in order to support simple and efficient lookups.
 
 Changing lookup attributes after storing a secret is a breaking change, as the same secret can no longer be retrieved using the new attributes.
 
 ### `xdg:schema` attribute (optional)
 
-The `xdg:schema` attribute is optional and is not part of the Secret Service specification (GNOME Libsecret sets it internally). However, we recommend setting it to your application ID (or another unique, stable identifier) to avoid collisions with other applications and for compatibility with GNOME Libsecret ([more details](#migration-from-gnome-libsecret)).
+The `xdg:schema` attribute is optional and is not part of the Secret Service specification (GNOME Libsecret sets it internally). However, we recommend setting it to the application ID (or another unique, stable identifier) to avoid collisions with other applications and for compatibility with GNOME Libsecret ([more details](#migration-from-gnome-libsecret)).
 
 ```dart
 const lookupAttributes = {
@@ -141,7 +147,7 @@ The default is `.throwException` to avoid silently returning or deleting an unex
 > [!TIP]
 > According to the [GNOME Libsecret documentation](https://gnome.pages.gitlab.gnome.org/libsecret/libsecret-c-examples.html#lookup-a-password), GNOME Libsecret handles duplicate matches by returning the most recently stored item.
 >
-> Pass `.newestCreated` to the `duplicateStrategy` parameter if you want behavior similar to GNOME Libsecret, rather than relying on the service-defined ordering of `.first`.
+> Pass `.newestCreated` to the `duplicateStrategy` parameter to obtain behavior similar to GNOME Libsecret, rather than relying on the service-defined ordering of `.first`.
 
 > [!TIP]
 > When storing secrets, use `replace: true` to update an existing item with the same lookup attributes instead of creating duplicate items. However, duplicates may still occur, so lookup duplication handling is still required.
@@ -154,11 +160,11 @@ The Secret Service may require user interaction to complete an operation, such a
 
 This library automatically handles lock checks, unlocking, prompting, waiting for the prompt's Completed signal, checking whether the prompt was dismissed, and processing the operation-specific result.
 
-If a prompt is required, the method awaits until the prompt completes. This happens when the user either dismisses the prompt or completes the required action (for example, entering their password). During this time, you may wish to display a loading or progress indicator in your application's UI.
+If a prompt is required, the method awaits until the prompt completes. This happens when the user either dismisses the prompt or completes the required action (for example, entering their password). During this time, a loading or progress indicator can be displayed in the application's UI.
 
-### Providing [Window ID](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.3.3.6.4.2.4.1) (optional)
+### Providing Window ID (optional)
 
-By default, this library passes an empty window ID (`""`) to the Secret Service. If your application can provide a platform-specific window handle, you may supply it to allow the desktop environment to associate prompts with your application's window (for example, presenting them as a transient dialog).
+By default, this library passes an empty [window ID](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.3.3.6.4.2.4.1) (`""`) to the Secret Service. If the application can provide a platform-specific window handle, you may supply it to allow the desktop environment to associate prompts with the application's window (for example, presenting them as a transient dialog).
 
 ```dart
 final client = FreeDesktopSecret(
@@ -181,13 +187,13 @@ final client = FreeDesktopSecret(
 ```
 
 > [!NOTE]
-> However, when a non-null `dbusClientProvider` is provided, `FreeDesktopSecret.close()` does not call [`DBusClient.close()`](https://pub.dev/documentation/dbus/latest/dbus/DBusClient/close.html). In that case, the caller retains ownership of the `DBusClient` instance and is responsible for closing it.
+> When a non-null `dbusClientProvider` is provided, `FreeDesktopSecret.close()` does not call [`DBusClient.close()`](https://pub.dev/documentation/dbus/latest/dbus/DBusClient/close.html). In that case, the caller retains ownership of the `DBusClient` instance and is responsible for closing it.
 >
 > This ownership model is consistent with other Linux D-Bus packages, such as [avahi](https://github.com/canonical/avahi.dart/blob/3ebbfc338d064f2f95843668968d27610c521ed8/lib/src/avahi_client.dart#L11-L23) and [xdg_desktop_portal](https://github.com/canonical/xdg_desktop_portal.dart/blob/e5b0701ca6e2d263def37fdbd2635e5beadf649a/lib/src/xdg_desktop_portal_client.dart#L105-L107).
 
-## Migration From [GNOME Libsecret](https://gnome.pages.gitlab.gnome.org/libsecret/)
+## Migration from GNOME Libsecret
 
-Since both Libsecret and this package communicate with the same Secret Service API over D-Bus, compatibility can be retained (i.e., without removing existing user data).
+Since both [Libsecret](https://gnome.pages.gitlab.gnome.org/libsecret/) and this package communicate with the same Secret Service API over D-Bus, compatibility can be retained (i.e., without removing existing user data).
 
 For example, the following schema definition in GNOME Libsecret:
 
@@ -218,7 +224,7 @@ gchar *password = secret_password_lookup_sync(
 
 Uses the schema name `org.example.Example` and defines two string attributes: `service` and `account`.
 
-The equivalent lookup in Dart:
+The equivalent lookup attributes in Dart:
 
 ```dart
 import 'package:freedesktop_secret/freedesktop_secret.dart';
@@ -238,10 +244,8 @@ The `xdg:schema` attribute corresponds to the Libsecret schema name (Libsecret [
 
 ## Compatibility with existing packages
 
-Some packages may use a hardcoded schema name when using GNOME Libsecret on Linux.
-
 > [!TIP]
-> The lookup attributes shown above bellow internal implementation details of the respective plugins and may change over time. However, changing them is a breaking change.
+> The lookup attributes below reflect internal implementation details of the respective plugins and may change over time.
 
 ### [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage)
 
@@ -260,7 +264,7 @@ await storage.write(key: 'username', value: 'flutter_user');
 In the current [`flutter_secure_storage_linux`](https://github.com/juliansteenbakker/flutter_secure_storage/tree/develop/flutter_secure_storage_linux) implementation, the item can be looked up using:
 
 ```dart
-// Replace <APPLICATION_ID> with your Flutter Linux application ID,
+// Replace <APPLICATION_ID> with the Flutter Linux application ID,
 // for example: 'org.example.Example'
 
 final applicationId = '<APPLICATION_ID>';
@@ -302,7 +306,7 @@ set(APPLICATION_ID "...")
 ### [`simple_secure_storage`](https://pub.dev/packages/simple_secure_storage)
 
 > [!NOTE]
-> There is [a pull request](https://github.com/Skyost/SimpleSecureStorage/pull/15) that updates `simple_secure_storage_linux` to use `freedesktop_secret` for early testing.
+> See also this [pull request](https://github.com/Skyost/SimpleSecureStorage/pull/15) that updates `simple_secure_storage_linux` to use `freedesktop_secret`.
 
 [`simple_secure_storage_linux` uses the schema `fr.skyost.SimpleSecureStorage` with `data` attribute](https://github.com/Skyost/SimpleSecureStorage/blob/5940541cbb2a457a43735a6047434354c49bf77e/packages/simple_secure_storage_linux/linux/simple_secure_storage_linux_plugin.cc#L25-L36):
 
@@ -458,19 +462,19 @@ Although many failures seem uncommon in practice, catching `Exception` ensures t
 
 ```dart
 try {
-  // Your operations here...
+  // Operations here...
 } on Exception catch (e) {
   ...
 }
 ```
 
-If you are writing a library, consider avoiding patterns like this:
+When writing a library, consider avoiding patterns like this:
 
 ```dart
 // Avoid this pattern when possible.
 
 try {
-  // Your operations here...
+  // Operations here...
   print('Succeeds');
   return true;
 } catch (e) {
@@ -488,7 +492,7 @@ This pattern has several limitations:
   - Applications can still map exceptions to `Result` failures according to their own error-handling requirements.
 
 > [!TIP]
-> This recommendation is **not specific** to `freedesktop_secret`. The same guidance generally applies when using libraries such as `dart:io`, `package:flutter_secure_storage`, and many other Dart and Flutter packages.
+> This recommendation is not specific to `freedesktop_secret`. The same guidance generally applies when using libraries such as `dart:io`, `package:flutter_secure_storage`, and many other Dart and Flutter packages.
 
 ### Secret Service security model
 
@@ -569,17 +573,17 @@ Most Flutter plugins and packages store secrets in the default collection as wel
 - [`biometric_storage`](https://github.com/authpass/biometric_storage/blob/0bbd368356518d3c158f6a32e049b5dd8c39060a/linux/biometric_storage_plugin.cc#L160)
 - [`dbus_secrets`](https://github.com/akshaybabloo/dbus_secrets/blob/31da1752a3dd23bc82691f7a56d3239f6d63eadc/lib/dbus_secrets.dart#L9)
 
-### Partial FreeDesktop Secret Service API coverage
+### Partial Freedesktop Secret Service API coverage
 
-This package does not expose the entire FreeDesktop Secret Service API (that is, it is not a one-to-one mapping of the D-Bus interface). Instead, it focuses on the functionality commonly required by Flutter applications.
+This package does not expose the entire Freedesktop Secret Service API (that is, it is not a one-to-one mapping of the D-Bus interface). Instead, it focuses on the functionality commonly required by Flutter applications.
 
 For example, it does not provide an option for the application to programmatically dismiss a service prompt dialog after it has been shown as part of an operation. The user must explicitly confirm or dismiss the prompt themselves.
 
-For most Flutter applications, this limitation is not relevant.
+For many Flutter applications, this limitation is unlikely to be relevant.
 
 ## Related packages
 
-- `freedesktop_secret_portal` (planned) for sandboxed applications (e.g., Flatpak) without direct D-Bus access to `org.freedesktop.secrets`.
+- [`xdg_secret_portal_store`](https://pub.dev/packages/xdg_secret_portal_store) for sandboxed applications (e.g., Flatpak, Snap) without direct D-Bus access to `org.freedesktop.secrets`.
 
 ## Known `secret-tool lookup` CLI issue (GNOME Libsecret)
 
@@ -599,3 +603,4 @@ This is a [known GNOME Libsecret issue](https://gitlab.gnome.org/GNOME/libsecret
 
 - [`package:dbus`](https://pub.dev/packages/dbus) (Dart package)
 - [`org.freedesktop.Secrets.xml`](https://github.com/GNOME/libsecret/blob/main/libsecret/org.freedesktop.Secrets.xml) D-Bus introspection data was copied from the GNOME Libsecret project source code ([accompanying COPYING file](third_party/libsecret/COPYING)).
+- [Freedesktop organization](https://freedesktop.org/).

@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Improves the README: adds a "Features" section, fixes dead links, and references the published [`xdg_secret_portal_store`](https://pub.dev/packages/xdg_secret_portal_store).
+
 ## 0.1.0
 
 - Adds a new recommendation regarding the security model of `org.freedesktop.secrets` design.
