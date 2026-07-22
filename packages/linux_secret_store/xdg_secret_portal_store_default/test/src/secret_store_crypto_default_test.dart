@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:test/test.dart';
-import 'package:xdg_secret_portal_store/src/secret_store_crypto/default.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
+import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
 void main() {
   late SecretStoreCrypto crypto;

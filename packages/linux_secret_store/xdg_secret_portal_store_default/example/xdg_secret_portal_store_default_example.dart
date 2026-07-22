@@ -11,7 +11,7 @@ import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.
 
 void main() async {
   XdgSecretPortalStore(
-    secretRetriever: ({String? token}) async => Uint8List.fromList([]),
+    masterSecretRetriever: ({String? token}) async => Uint8List.fromList([]),
     persistence: SecretStorePersistenceFile(File('')),
     crypto: SecretStoreCryptoDefault(),
   );
