@@ -2,7 +2,7 @@ name: xdg_secret_portal_store
 description: >
   A helper library for storing application secrets in an encrypted file using
   the master secret provided by the XDG Desktop Portal Secret API.
-version: 0.1.1
+version: 0.2.0
 repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/linux_secret_store/xdg_secret_portal_store
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20xdg_secret_portal_store
 topics: [os-integration, xdg-portal, secure-storage]
@@ -14,6 +14,6 @@ dev_dependencies:
   # Used in the example and integration tests.
   xdg_desktop_portal: ^0.1.13
   xdg_directories: ^1.1.0
-  xdg_secret_portal_store_default:
-    path: ../xdg_secret_portal_store_default
+  # xdg_secret_portal_store_default:
+  #   path: ../xdg_secret_portal_store_default
   test: ^1.31.2
