@@ -5,8 +5,6 @@ import 'package:xdg_secret_portal_store/src/encrypted_secret_store.dart';
 import 'package:xdg_secret_portal_store/src/secret_store_persistence/interface.dart';
 
 /// File-based [SecretStorePersistence] implementation.
-///
-/// Uses `$XDG_DATA_HOME/xdg_secret_portal_store/secrets.json` by default.
 class SecretStorePersistenceFile implements SecretStorePersistence {
   SecretStorePersistenceFile(this._file);
 
