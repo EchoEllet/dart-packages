@@ -36,6 +36,7 @@ class EncryptedSecretStore {
   final String ciphertext;
 
   /// Base64-encoded message authentication code.
+  /// Also known as the authentication tag.
   final String mac;
 
   Map<String, Object> toJson() => {

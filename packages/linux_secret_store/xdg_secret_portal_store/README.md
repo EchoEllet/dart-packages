@@ -105,7 +105,7 @@ Where:
 - `cipher` is the authenticated encryption (AEAD) algorithm.
 - `nonce` is the Base64-encoded nonce.
 - `ciphertext` is the Base64-encoded encrypted UTF-8 JSON representation of the secret map (`Map<String, String>`).
-- `mac` is the Base64-encoded message authentication code.
+- `mac` is the Base64-encoded message authentication code. Also known as the authentication tag.
 
 ## File Path
 
