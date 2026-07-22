@@ -581,7 +581,7 @@ For example, it does not provide an option for the application to programmatical
 
 For many Flutter applications, this limitation is unlikely to be relevant.
 
-## Related packages
+## See also
 
 - [`xdg_secret_portal_store`](https://pub.dev/packages/xdg_secret_portal_store) for sandboxed applications (e.g., Flatpak, Snap) without direct D-Bus access to `org.freedesktop.secrets`.
 
