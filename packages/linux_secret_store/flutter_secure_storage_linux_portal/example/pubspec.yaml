@@ -1,0 +1,17 @@
+name: example
+description: "Demonstrates how to use the flutter_secure_storage_linux_portal."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^11.0.0-beta.1
+  flutter_secure_storage_linux_portal:
+    path: ../
+
+flutter:
+  uses-material-design: true
