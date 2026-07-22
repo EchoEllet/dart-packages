@@ -13,7 +13,7 @@ dart pub add xdg_secret_portal_store xdg_secret_portal_store_default xdg_desktop
 ```dart
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
-import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart' show SecretStoreCryptoDefault;
+import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
 final portalClient = XdgDesktopPortalClient();
 
