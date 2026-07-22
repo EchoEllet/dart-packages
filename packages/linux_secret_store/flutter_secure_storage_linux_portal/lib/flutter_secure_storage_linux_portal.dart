@@ -5,6 +5,7 @@ import 'package:linux_application_id/linux_application_id.dart';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 import 'package:xdg_directories/xdg_directories.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
+import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
 typedef _StorageMap = Map<String, String>;
 
@@ -35,8 +36,9 @@ class FlutterSecureStorageLinuxPortal extends FlutterSecureStoragePlatform {
         '${dataHome.path}/$_applicationId/xdg_secret_portal_store/secrets.json';
 
     _store = XdgSecretPortalStore(
-      secretRetriever: _client.secret.retrieveSecret,
+      masterSecretRetriever: _client.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(File(filePath)),
+      crypto: SecretStoreCryptoDefault(),
     );
 
     await _store.loadMasterSecret();

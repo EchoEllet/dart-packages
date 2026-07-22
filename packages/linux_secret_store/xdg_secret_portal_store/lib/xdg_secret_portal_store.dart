@@ -37,7 +37,7 @@ typedef SecretMap = Map<String, String>;
 /// await store.write({'password': '123'});
 /// ```
 ///
-/// The master secret is retrieved through the provided [secretRetriever] and
+/// The master secret is retrieved through the provided [masterSecretRetriever] and
 /// used to encrypt and decrypt the secret store.
 ///
 /// Call [loadMasterSecret] before using [read] or [write].

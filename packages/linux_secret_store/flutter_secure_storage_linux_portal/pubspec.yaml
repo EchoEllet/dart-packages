@@ -10,7 +10,8 @@ environment:
 
 dependencies:
   flutter_secure_storage_platform_interface: ^2.0.1
-  xdg_secret_portal_store: ^0.1.0
+  xdg_secret_portal_store: ^0.2.0
+  xdg_secret_portal_store_default: ^0.1.1
   xdg_desktop_portal: ^0.1.13
   xdg_directories: ^1.1.0
   linux_application_id: ^1.0.0
