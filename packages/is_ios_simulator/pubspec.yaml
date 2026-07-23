@@ -1,6 +1,6 @@
 name: is_ios_simulator
 description: Checks whether the app is running in the iOS Simulator or on a physical device
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/is_ios_simulator
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20is_ios_simulator
 topics: [ios, simulator, device]
@@ -12,10 +12,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  meta: ^1.18.0
 
 dev_dependencies:
-  pigeon: ^26.3.4
+  pigeon: ^27.3.0
 
 flutter:
   plugin:

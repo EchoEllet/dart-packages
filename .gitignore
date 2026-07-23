@@ -17,6 +17,7 @@ pubspec.lock
 # Swift Package Manager
 .build
 .swiftpm
+swiftpm/
 
 # Generated Flutter directory
 Flutter
