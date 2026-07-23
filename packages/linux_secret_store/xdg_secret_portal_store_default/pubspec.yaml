@@ -3,7 +3,7 @@ description: A default cryptographic implementation of xdg_secret_portal_store t
 version: 0.1.1
 repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/linux_secret_store/xdg_secret_portal_store_default
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20xdg_secret_portal_store_default
-topics: [os-integration, xdg-portal, secure-storage]
+topics: [secure-storage, xdg-portal, linux]
 
 environment:
   sdk: ^3.10.0
