@@ -15,7 +15,7 @@ dependencies:
   jni_flutter: ^1.0.1
 
 dev_dependencies:
-  jnigen: ^0.17.0
+  jnigen: ^1.0.0
 
 flutter:
   plugin:

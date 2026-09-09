@@ -2,19 +2,13 @@ import 'dart:io';
 
 import 'package:jnigen/jnigen.dart';
 
-void main(List<String> args) {
+void main(List<String> args) async {
   final packageRoot = Platform.script.resolve('../');
-  generateJniBindings(
-    Config(
-      outputConfig: OutputConfig(
-        dartConfig: DartCodeOutputConfig(
-          path: packageRoot.resolve('lib/src/android_bindings.g.dart'),
-          structure: OutputStructure.singleFile,
-        ),
-      ),
-      androidSdkConfig: AndroidSdkConfig(
+  final generator = JniGenerator(
+    input: .new(
+      androidSdk: .new(
         addGradleDeps: true,
-        androidExample: '../system_accent_color/example',
+        androidExample: packageRoot.resolve('../system_accent_color/example'),
       ),
       classes: [
         'android.util.TypedValue',
@@ -23,5 +17,12 @@ void main(List<String> args) {
         'android.R',
       ],
     ),
+    output: .new(
+      dart: .new(
+        path: packageRoot.resolve('lib/src/android_bindings.g.dart'),
+        structure: .singleFile,
+      ),
+    ),
   );
+  await generator.generate();
 }
