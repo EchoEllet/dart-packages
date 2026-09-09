@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.2.0
   connectivity_plus_linux_portal:
     path: ../
   connectivity_plus: ^7.1.1

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:is_ios_simulator/is_ios_simulator.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(const MainApp());

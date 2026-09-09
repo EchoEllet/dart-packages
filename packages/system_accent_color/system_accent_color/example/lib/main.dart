@@ -1,12 +1,10 @@
-// ignore_for_file: avoid_print
-
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:system_accent_color/system_accent_color.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final accentColor = await SystemAccentColor().getAccentColor();
-  print('Accent color: $accentColor');
+  debugPrint('Accent color: $accentColor');
 
   runApp(MainApp(accentColor: accentColor));
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:linux_application_id/linux_application_id.dart';
 
 void main() {

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_secure_storage_linux_portal/flutter_secure_storage_linux_portal.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   FlutterSecureStorageLinuxPortal.registerWith();
