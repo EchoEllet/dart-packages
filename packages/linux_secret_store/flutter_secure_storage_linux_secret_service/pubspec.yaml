@@ -1,0 +1,22 @@
+name: flutter_secure_storage_linux_secret_service
+description: A Linux implementation of the flutter_secure_storage plugin using the Secret Service API (org.freedesktop.secrets)
+version: 0.0.1
+repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/linux_secret_store/flutter_secure_storage_linux_secret_service
+issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20flutter_secure_storage_linux_secret_service
+topics: [os-integration, secure-storage, dbus, flutter-secure-storage]
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter_secure_storage_platform_interface: ^2.0.1
+  freedesktop_secret: ^0.1.0
+  linux_application_id: ^1.0.0
+
+flutter:
+  plugin:
+    implements: flutter_secure_storage
+    platforms:
+      linux:
+        dartPluginClass: FlutterSecureStorageLinuxSecretService
+        fileName: flutter_secure_storage_linux_secret_service.dart

@@ -1,5 +1,5 @@
 name: example
-description: "Demonstrates how to use the flutter_secure_storage_linux_portal."
+description: "Demonstrates how to use the flutter_secure_storage_linux_secret_service."
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   material_ui: ^1.2.0
   flutter_secure_storage: ^11.1.0
-  flutter_secure_storage_linux_portal:
+  flutter_secure_storage_linux_secret_service:
     path: ../
 
 flutter:

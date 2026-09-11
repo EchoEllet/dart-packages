@@ -1,9 +1,9 @@
 name: flutter_secure_storage_linux_portal
-description: Linux implementation of flutter_secure_storage using the XDG Desktop Portal Secret API (org.freedesktop.portal.Secret)
+description: A Linux implementation of the flutter_secure_storage plugin using the XDG Desktop Portal Secret API (org.freedesktop.portal.Secret)
 version: 0.0.1
 repository: https://github.com/EchoEllet/dart-packages/tree/main/packages/linux_secret_store/flutter_secure_storage_linux_portal
 issue_tracker: https://github.com/EchoEllet/dart-packages/issues/new?labels=p%3A%20flutter_secure_storage_linux_portal
-topics: [os-integration, xdg-portal, secure-storage]
+topics: [os-integration, xdg-portal, secure-storage, flutter-secure-storage]
 
 environment:
   sdk: ^3.10.0

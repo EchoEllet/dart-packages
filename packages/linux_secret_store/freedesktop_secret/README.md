@@ -19,7 +19,7 @@ This package communicates with the [Secret Service API](https://specifications.f
 
 - Pure Dart implementation using D-Bus directly.
 - Does not require additional system packages to build or run the application (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
-- Uses the standard Secret Service API, which is the primary API used by GNOME Libsecret, making it possible to retain compatibility without data migration ([more details](#migration-from-gnome-libsecret)).
+- Uses the standard Secret Service API, which is the primary API used by GNOME libsecret, making it possible to retain compatibility without data migration ([more details](#migration-from-gnome-libsecret)).
 - Handles prompts, unlocking the default collection ([also known](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) as a keyring or wallet) and items when needed.
 - Automatically creates the default collection when it does not exist (e.g., on fresh Linux installations).
 - Provides convenience strategies for handling duplicate matches during lookup and deletion.
@@ -249,8 +249,8 @@ The `xdg:schema` attribute corresponds to the Libsecret schema name (Libsecret [
 
 ### [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage)
 
-> [!NOTE]
-> There is [a pull request](https://github.com/juliansteenbakker/flutter_secure_storage/pull/1182) that updates `flutter_secure_storage_linux` to use `freedesktop_secret` for early testing.
+> [!TIP]
+> Use [`package:flutter_secure_storage_linux_secret_service`](http://pub.dev/packages/flutter_secure_storage_linux_secret_service) for a `flutter_secure_storage` Linux implementation that uses `freedesktop_secret`.
 
 [`flutter_secure_storage_linux`](https://github.com/juliansteenbakker/flutter_secure_storage/tree/develop/flutter_secure_storage_linux/linux/include) stores all key-value pairs in a single item as JSON.
 

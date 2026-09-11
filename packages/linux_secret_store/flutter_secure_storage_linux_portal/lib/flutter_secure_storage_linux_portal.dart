@@ -9,8 +9,8 @@ import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.
 
 typedef _StorageMap = Map<String, String>;
 
-/// Linux implementation of [FlutterSecureStoragePlatform] using the XDG
-/// Desktop Portal Secret API.
+/// A Linux implementation of [FlutterSecureStoragePlatform] using the
+/// XDG Desktop Portal Secret API ([`org.freedesktop.portal.Secret`](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html)).
 class FlutterSecureStorageLinuxPortal extends FlutterSecureStoragePlatform {
   /// Registers this class as the default instance of [FlutterSecureStoragePlatform].
   static void registerWith() {

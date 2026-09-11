@@ -12,6 +12,9 @@ import 'package:flutter_secure_storage_linux_portal/flutter_secure_storage_linux
 FlutterSecureStorageLinuxPortal.registerWith();
 ```
 
+> [!IMPORTANT]
+> `FlutterSecureStorageLinuxPortal.registerWith()` must be explicitly called. Simply adding the package as a dependency is not sufficient.
+
 ## File Path
 
 Stores the secrets encrypted in [a file](https://pub.dev/packages/xdg_secret_portal_store#storage-format):
@@ -21,3 +24,9 @@ Stores the secrets encrypted in [a file](https://pub.dev/packages/xdg_secret_por
 ## Cryptography
 
 For [security details](https://pub.dev/packages/xdg_secret_portal_store#cryptography).
+
+## Historical Background
+
+This package was originally developed to be part of the `flutter_secure_storage` repository in [#1204](https://github.com/juliansteenbakker/flutter_secure_storage/pull/1204). The PR was not merged, and it was published in a separate repository.
+
+See also: [#1203](https://github.com/juliansteenbakker/flutter_secure_storage/issues/1203)
