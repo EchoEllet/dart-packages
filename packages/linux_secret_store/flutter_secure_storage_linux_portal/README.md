@@ -15,6 +15,30 @@ FlutterSecureStorageLinuxPortal.registerWith();
 > [!IMPORTANT]
 > `FlutterSecureStorageLinuxPortal.registerWith()` must be explicitly called. Simply adding the package as a dependency is not sufficient.
 
+## Example
+
+The following example registers this implementation when running in Flatpak.
+
+```dart
+import 'dart:io';
+
+import 'package:flutter_secure_storage_linux_portal/flutter_secure_storage_linux_portal.dart';
+
+if (Platform.isLinux) {
+  final isFlatpak =
+      Platform.environment.containsKey('FLATPAK_ID') ||
+      Platform.environment['container'] == 'flatpak';
+
+  if (isFlatpak) {
+    FlutterSecureStorageLinuxPortal.registerWith();
+  }
+}
+```
+
+> [!TIP]
+> This is only an example of when to register the implementation. Applications
+may choose different conditions based on their environment or requirements.
+
 ## File Path
 
 Stores the secrets encrypted in [a file](https://pub.dev/packages/xdg_secret_portal_store#storage-format):
@@ -23,7 +47,7 @@ Stores the secrets encrypted in [a file](https://pub.dev/packages/xdg_secret_por
 
 ## Cryptography
 
-For [security details](https://pub.dev/packages/xdg_secret_portal_store#cryptography).
+For [security details](https://pub.dev/packages/xdg_secret_portal_store_default#cryptography).
 
 ## Historical Background
 

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage_platform_interface.dart';
 import 'package:linux_application_id/linux_application_id.dart';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
-import 'package:xdg_directories/xdg_directories.dart';
+import 'package:xdg_directories/xdg_directories.dart' as xdg_directories;
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
 import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
@@ -33,7 +33,7 @@ class FlutterSecureStorageLinuxPortal extends FlutterSecureStoragePlatform {
     _client = XdgDesktopPortalClient();
 
     final filePath =
-        '${dataHome.path}/$_applicationId/xdg_secret_portal_store/secrets.json';
+        '${xdg_directories.dataHome.path}/$_applicationId/xdg_secret_portal_store/secrets.json';
 
     _store = XdgSecretPortalStore(
       masterSecretRetriever: _client.secret.retrieveSecret,
