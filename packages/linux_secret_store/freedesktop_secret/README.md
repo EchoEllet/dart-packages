@@ -250,7 +250,7 @@ The `xdg:schema` attribute corresponds to the Libsecret schema name (Libsecret [
 ### [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage)
 
 > [!TIP]
-> Use [`package:flutter_secure_storage_linux_secret_service`](http://pub.dev/packages/flutter_secure_storage_linux_secret_service) for a `flutter_secure_storage` Linux implementation that uses `freedesktop_secret`.
+> Use [`package:flutter_secure_storage_linux_secret_service`](https://pub.dev/packages/flutter_secure_storage_linux_secret_service) for a `flutter_secure_storage` Linux implementation that uses `freedesktop_secret`.
 
 [`flutter_secure_storage_linux`](https://github.com/juliansteenbakker/flutter_secure_storage/tree/develop/flutter_secure_storage_linux/linux/include) stores all key-value pairs in a single item as JSON.
 

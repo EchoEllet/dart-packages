@@ -1,3 +1,7 @@
+## 0.1.4
+
+- Fixes a non-HTTPS link in README to satisfy pub static analysis.
+
 ## 0.1.3
 
 - Changes `storeSecretText()` content type from `text/plain; charset=utf-8` to `text/plain` to fix the following libsecret interoperability issues:
