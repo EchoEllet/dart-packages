@@ -289,10 +289,6 @@ void main() {
 
   test('textual secrets can be stored as bytes', () async {
     // Verifies that textual secrets can be stored via the binary API.
-    //
-    // This can serve as a workaround for a current `secret-tool lookup` limitation,
-    // which only supports secrets with the `text/plain` content type:
-    // https://gitlab.gnome.org/GNOME/libsecret/-/work_items/114
 
     final attrs = {'user': '@new_username'};
 
@@ -307,6 +303,22 @@ void main() {
     expect(secret, isNotNull);
     expect(secret!.secretAsText(), 'super important secret');
     expect(secret.contentType, 'text/plain');
+  });
+
+  test('text/plain; charset=utf-8 secrets can be read', () async {
+    final attrs = {'content-type': 'text/plain; charset=utf-8'};
+
+    await storeSecretBytes(
+      attributes: attrs,
+      secretBytes: Uint8List.fromList(utf8.encode('my-secret')),
+      contentType: 'text/plain; charset=utf-8',
+    );
+
+    final secret = await lookupSecret(attributes: attrs);
+
+    expect(secret, isNotNull);
+    expect(secret!.secretAsText(), 'my-secret');
+    expect(secret.contentType, 'text/plain; charset=utf-8');
   });
 
   test(

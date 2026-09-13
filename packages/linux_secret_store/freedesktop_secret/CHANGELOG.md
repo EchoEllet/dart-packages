@@ -1,3 +1,9 @@
+## 0.1.3
+
+- Changes `storeSecretText()` content type from `text/plain; charset=utf-8` to `text/plain` to fix the following libsecret interoperability issues:
+  - `secret-tool lookup` may report `secret does not contain a textual password` due to a [libsecret tool bug](https://gitlab.gnome.org/GNOME/libsecret/-/work_items/114).
+  - [`secret_value_get_text`](https://gnome.pages.gitlab.gnome.org/libsecret/method.Value.get_text.html#description) from libsecret accepts only `text/plain`.
+
 ## 0.1.2
 
 - Updates pub topics in package metadata.

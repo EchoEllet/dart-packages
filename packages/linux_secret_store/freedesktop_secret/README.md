@@ -585,17 +585,16 @@ For many Flutter applications, this limitation is unlikely to be relevant.
 
 - [`xdg_secret_portal_store`](https://pub.dev/packages/xdg_secret_portal_store) for sandboxed applications (e.g., Flatpak, Snap) without direct D-Bus access to `org.freedesktop.secrets`.
 
-## Known `secret-tool lookup` CLI issue (GNOME Libsecret)
+## Known `secret-tool lookup` CLI issue (GNOME libsecret)
 
-`FreeDesktopSecret.storeSecretText()` stores text secrets with the content type `text/plain; charset=utf-8`:
+`FreeDesktopSecret.storeSecretText()` stores text secrets with the content type `text/plain`.
 
-```dart
-await client.storeSecretText(secret: '...');
-```
+However, when using `FreeDesktopSecret.storeSecret()` with content type `text/plain; charset=utf-8`, older versions of the libsecret tool may fail to read the secret.
+
+- `secret-tool search` displays these secrets correctly.
+- `secret-tool lookup` rejects the secret with the message `secret does not contain a textual password` because it expects the content type to be exactly `text/plain`.
 
 This content type is permitted by the Secret Service specification, which even uses `text/plain; charset=utf8` as [an example](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.3.4.2.2.5.4).
-
-`secret-tool search` (from GNOME Libsecret) displays these secrets correctly. However, `secret-tool lookup` rejects the secret with the message `secret does not contain a textual password` because it expects the content type to be exactly `text/plain`.
 
 This is a [known GNOME Libsecret issue](https://gitlab.gnome.org/GNOME/libsecret/-/work_items/114). At the time of writing, there is an [open merge request](https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/175) to address it.
 

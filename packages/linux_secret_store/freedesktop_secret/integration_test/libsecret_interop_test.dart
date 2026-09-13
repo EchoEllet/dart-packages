@@ -1,9 +1,6 @@
 @TestOn('vm && linux')
 library;
 
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:freedesktop_secret/freedesktop_secret.dart';
 import 'package:test/test.dart';
 
@@ -50,38 +47,6 @@ void main() {
     'service': 'dummy-app',
     'account': 'test-user',
   });
-
-  /// Stores a UTF-8 text secret for interoperability tests.
-  ///
-  /// This helper intentionally uses `text/plain` instead of
-  /// `text/plain; charset=utf-8` as a temporary workaround for a
-  /// `secret-tool lookup` limitation. The libsecret C API accepts both content
-  /// types, but current versions of `secret-tool lookup` reject
-  /// `text/plain; charset=utf-8`.
-  ///
-  /// Tracking issue:
-  /// https://gitlab.gnome.org/GNOME/libsecret/-/work_items/114
-  ///
-  /// Open merge request:
-  /// https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/175
-  ///
-  /// Remove this helper once the fix is widely available.
-  ///
-  /// See also: https://pub.dev/packages/freedesktop_secret#known-secret-tool-lookup-cli-issue-gnome-libsecret
-  Future<void> storeSecretText({
-    required Map<String, String> attributes,
-    required String secret,
-    required String label,
-    required bool replace,
-  }) {
-    return client.storeSecret(
-      attributes: attributes,
-      secretBytes: Uint8List.fromList(utf8.encode(secret)),
-      contentType: 'text/plain',
-      label: label,
-      replace: replace,
-    );
-  }
 
   group('GNOME libsecret -> FreeDesktopSecret', () {
     test('store -> lookup', () async {
@@ -142,7 +107,7 @@ void main() {
     test('store -> lookup', () async {
       final attributes = sampleAttributes;
 
-      await storeSecretText(
+      await client.storeSecretText(
         attributes: attributes,
         secret: testSecret,
         label: testLabel,
@@ -157,7 +122,7 @@ void main() {
     test('store -> search', () async {
       final attributes = sampleAttributes;
 
-      await storeSecretText(
+      await client.storeSecretText(
         attributes: attributes,
         secret: testSecret,
         label: testLabel,
@@ -189,7 +154,7 @@ void main() {
     test('store -> delete', () async {
       final attributes = sampleAttributes;
 
-      await storeSecretText(
+      await client.storeSecretText(
         attributes: attributes,
         secret: testSecret,
         label: testLabel,
