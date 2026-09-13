@@ -18,6 +18,14 @@ class FlutterSecureStorageLinuxSecretService
 
   /// Secret Service client (`org.freedesktop.secrets`).
   final FreeDesktopSecret _client = FreeDesktopSecret();
+
+  /// Overrides the Linux application ID.
+  ///
+  /// If null, the application ID of the running GLib `GApplication` is used.
+  ///
+  /// The application ID is used for the `xdg:schema` attribute of stored secrets
+  /// and for migrating legacy secrets.
+  String? applicationIdOverride;
   late String _applicationId;
 
   Future<void>? _initialization;
@@ -32,27 +40,25 @@ class FlutterSecureStorageLinuxSecretService
     await _client.initialize();
 
     if (migrateLegacyData) {
-      await migrateLegacyDataIfNeeded();
+      await _migrateLegacyDataIfNeeded();
     }
   }
 
-  /// Automatically migrates data from the legacy Linux implementation.
+  /// Automatically migrates data affected by [a historical bug](https://github.com/juliansteenbakker/flutter_secure_storage/issues/1181).
+  ///
+  /// See [_legacyLookupAttributes] for details.
   bool migrateLegacyData = true;
 
   /// Deletes the legacy secret after a successful migration.
+  ///
+  /// Defaults to `false` for consistency with the `flutter_secure_storage_linux` behavior:
+  /// https://github.com/juliansteenbakker/flutter_secure_storage/blob/fe7232b194ed7ab815c8fda59997fccc840844f4/flutter_secure_storage_linux/linux/include/Secret.hpp#L312-L313
   bool deleteLegacyData = false;
 
-  /// Overrides the Linux application ID.
+  /// Migrates legacy data if needed.
   ///
-  /// The application ID is used for the `xdg:schema` attribute of stored secrets
-  /// and for migrating legacy secrets.
-  String? applicationIdOverride;
-
-  // TODO: Wait for the upstream fix: https://github.com/juliansteenbakker/flutter_secure_storage/issues/1181
-  //  before publishing our downstream fix, which is already implemented.
-  //  This keeps our downstream version consistent with upstream.
-  //  Update README of this package if necessary.
-  Future<void> migrateLegacyDataIfNeeded() async {
+  /// See [_legacyLookupAttributes] for details.
+  Future<void> _migrateLegacyDataIfNeeded() async {
     final secretCount = await _client.countSecrets(
       attributes: _lookupAttributes(),
     );
@@ -73,28 +79,36 @@ class FlutterSecureStorageLinuxSecretService
     await _writeStorageMap(legacySecret.storageMap());
 
     if (deleteLegacyData) {
-      await _client.deleteSecret(attributes: legacyAttributes);
+      await _client.deleteSecret(
+        attributes: legacyAttributes,
+        duplicateStrategy: .newestCreated,
+      );
     }
   }
 
   Future<void> _ensureInitialized() => _initialization ??= _initialize();
 
-  /// We intentionally do not include `xdg:schema` here.
-  /// The previous `flutter_secure_storage_linux` implementation incorrectly
+  /// Used to migrate data affected by [a historical bug](https://github.com/juliansteenbakker/flutter_secure_storage/issues/1181).
+  ///
+  /// The attribute `xdg:schema` is intentionally excluded here.
+  ///
+  /// Older versions of `flutter_secure_storage_linux` incorrectly
   /// populated the `xdg:schema` attribute with unstable yet unique values (for example,
   /// `*` or `9`). Instead, we match only on the application-specific
   /// `account` attribute, which was populated consistently, to preserve
   /// compatibility with existing data.
   ///
-  /// See: https://github.com/juliansteenbakker/flutter_secure_storage/issues/1181
+  /// `flutter_secure_storage_linux` (the upstream implementation) was updated
+  /// in [4.0.0-beta.1](https://pub.dev/packages/flutter_secure_storage_linux/versions/4.0.0-beta.1/changelog)
+  /// to fix this issue and migrate data affected by it:
+  /// https://github.com/juliansteenbakker/flutter_secure_storage/pull/1249
   Map<String, String> _legacyLookupAttributes() => {
     'account': '$_applicationId.secureStorage',
   };
 
-  /// Note: Changes to these lookup attributes are not backward compatible.
   Map<String, String> _lookupAttributes() => {
-    'xdg:schema': _applicationId,
-    'package': 'flutter_secure_storage',
+    'xdg:schema': '$_applicationId/FlutterSecureStorage',
+    'account': '$_applicationId.secureStorage',
   };
 
   /// Reads and decodes the stored key/value map.

@@ -2,6 +2,8 @@
 
 A Linux implementation of the [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage) plugin using the Secret Service API ([`org.freedesktop.secrets`](https://specifications.freedesktop.org/secret-service/latest-single/)).
 
+See also [`package:freedesktop_secret`](https://pub.dev/packages/freedesktop_secret), which provides the underlying pure Dart implementation of the Secret Service API used by this package.
+
 ## Features
 
 - Pure Dart implementation using D-Bus directly.
@@ -28,13 +30,18 @@ flutter pub add flutter_secure_storage_linux_secret_service
 > [!TIP]
 > Adding this package automatically registers this implementation and overrides `flutter_secure_storage_linux` (the endorsed implementation of `flutter_secure_storage`). No explicit imports are required.
 
-## Migration from the old schema
+## Legacy data migration
 
-In order to fix [#1181](https://github.com/juliansteenbakker/flutter_secure_storage/issues/1181) (a historical bug),
-this implementation automatically migrates the old data when appropriate.
+Older versions of `flutter_secure_storage_linux` had [a historical bug](https://github.com/juliansteenbakker/flutter_secure_storage/issues/1181) that caused the `xdg:schema` attribute to be populated incorrectly.
 
-The old secrets are not automatically deleted by default to refrain from destructive changes,
-so you need to explicitly opt in to remove:
+`flutter_secure_storage_linux` was updated
+in [4.0.0-beta.1](https://pub.dev/packages/flutter_secure_storage_linux/versions/4.0.0-beta.1/changelog) to fix this issue and migrate data affected by it. See [the relevant PR](https://github.com/juliansteenbakker/flutter_secure_storage/pull/1249) for details.
+
+This implementation also automatically migrates the old data when appropriate.
+
+The old secrets are not automatically deleted by default to avoid destructive changes, consistent with the behavior of `flutter_secure_storage_linux`, which leaves legacy items in place during migration ([the relevant code](https://github.com/juliansteenbakker/flutter_secure_storage/blob/fe7232b194ed7ab815c8fda59997fccc840844f4/flutter_secure_storage_linux/linux/include/Secret.hpp#L312-L313)).
+
+To opt in to deleting the old data:
 
 ```dart
 import 'package:flutter_secure_storage_linux_secret_service/flutter_secure_storage_linux_secret_service.dart';
@@ -50,7 +57,7 @@ if (secureStorageImplementation is FlutterSecureStorageLinuxSecretService) {
 To opt out of migrating the old data:
 
 ```dart
-// Opting out of auto migration for newer apps avoids an additional lookup.
+// Opting out of migration for newer apps avoids an additional lookup.
 secureStorageImplementation.migrateLegacyData = false;
 ```
 
