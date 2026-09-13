@@ -16,8 +16,8 @@ class FlutterSecureStorageLinuxSecretService
         FlutterSecureStorageLinuxSecretService();
   }
 
-  /// Secret Service client (`org.freedesktop.secrets`).
-  final FreeDesktopSecret _client = FreeDesktopSecret();
+  /// Freedesktop Secret Service API client.
+  final _client = SecretServiceClient();
 
   /// Overrides the Linux application ID.
   ///
