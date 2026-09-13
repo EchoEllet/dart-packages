@@ -11,46 +11,50 @@ typedef _StorageMap = Map<String, String>;
 
 /// A Linux implementation of [FlutterSecureStoragePlatform] using the
 /// XDG Desktop Portal Secret API ([`org.freedesktop.portal.Secret`](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html)).
+///
+/// [FlutterSecureStorageLinuxPortal.registerWith] must be explicitly called.
+/// Simply adding the package as a dependency is not sufficient.
 class FlutterSecureStorageLinuxPortal extends FlutterSecureStoragePlatform {
   /// Registers this class as the default instance of [FlutterSecureStoragePlatform].
   static void registerWith() {
     FlutterSecureStoragePlatform.instance = FlutterSecureStorageLinuxPortal();
   }
 
-  late final XdgDesktopPortalClient _client;
   late final XdgSecretPortalStore _store;
-  late String _applicationId;
 
   Future<void>? _initialization;
   Future<void> _initialize() async {
-    _applicationId =
-        applicationIdOverride ??
-        linuxApplicationId() ??
-        (throw UnsupportedError(
-          'No Linux application ID is available. This must be called from a running Flutter Linux application.',
-        ));
-
-    _client = XdgDesktopPortalClient();
-
-    final filePath =
-        '${xdg_directories.dataHome.path}/$_applicationId/xdg_secret_portal_store/secrets.json';
+    final client = XdgDesktopPortalClient();
 
     _store = XdgSecretPortalStore(
-      masterSecretRetriever: _client.secret.retrieveSecret,
-      persistence: SecretStorePersistenceFile(File(filePath)),
+      masterSecretRetriever: client.secret.retrieveSecret,
+      persistence: SecretStorePersistenceFile(
+        File(
+          '${xdg_directories.dataHome.path}/$_applicationId/xdg_secret_portal_store/secrets.json',
+        ),
+      ),
       crypto: SecretStoreCryptoDefault(),
     );
 
     await _store.loadMasterSecret();
+    await client.close();
   }
 
   Future<void> _ensureInitialized() => _initialization ??= _initialize();
 
   /// Overrides the Linux application ID.
   ///
+  /// If null, the application ID of the running GLib `GApplication` is used.
+  ///
   /// The application ID is used to determine the directory where the encrypted
   /// secret store is persisted.
   String? applicationIdOverride;
+  String get _applicationId =>
+      applicationIdOverride ??
+      linuxApplicationId() ??
+      (throw UnsupportedError(
+        'No Linux application ID is available. This must be called from a running Flutter Linux application.',
+      ));
 
   Future<_StorageMap> _readStorageMap() => _store.read();
   Future<void> _writeStorageMap(_StorageMap map) => _store.write(map);
