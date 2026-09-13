@@ -110,7 +110,7 @@ Changing lookup attributes after storing a secret is a breaking change, as the s
 
 ### `xdg:schema` attribute (optional)
 
-The `xdg:schema` attribute is optional and is not part of the Secret Service specification (GNOME Libsecret sets it internally). However, we recommend setting it to the application ID (or another unique, stable identifier) to avoid collisions with other applications and for compatibility with GNOME Libsecret ([more details](#migration-from-gnome-libsecret)).
+The `xdg:schema` attribute is optional and is not part of the Secret Service specification (GNOME libsecret sets it internally). However, we recommend setting it to the application ID (or another unique, stable identifier) to avoid collisions with other applications and for compatibility with GNOME libsecret ([more details](#migration-from-gnome-libsecret)).
 
 ```dart
 const lookupAttributes = {
@@ -145,9 +145,9 @@ await client.deleteSecret(
 The default is `.throwException` to avoid silently returning or deleting an unexpected secret.
 
 > [!TIP]
-> According to the [GNOME Libsecret documentation](https://gnome.pages.gitlab.gnome.org/libsecret/libsecret-c-examples.html#lookup-a-password), GNOME Libsecret handles duplicate matches by returning the most recently stored item.
+> According to the [GNOME libsecret documentation](https://gnome.pages.gitlab.gnome.org/libsecret/libsecret-c-examples.html#lookup-a-password), GNOME libsecret handles duplicate matches by returning the most recently stored item.
 >
-> Pass `.newestCreated` to the `duplicateStrategy` parameter to obtain behavior similar to GNOME Libsecret, rather than relying on the service-defined ordering of `.first`.
+> Pass `.newestCreated` to the `duplicateStrategy` parameter to obtain behavior similar to GNOME libsecret, rather than relying on the service-defined ordering of `.first`.
 
 > [!TIP]
 > When storing secrets, use `replace: true` to update an existing item with the same lookup attributes instead of creating duplicate items. However, duplicates may still occur, so lookup duplication handling is still required.
@@ -191,11 +191,11 @@ final client = FreeDesktopSecret(
 >
 > This ownership model is consistent with other Linux D-Bus packages, such as [avahi](https://github.com/canonical/avahi.dart/blob/3ebbfc338d064f2f95843668968d27610c521ed8/lib/src/avahi_client.dart#L11-L23) and [xdg_desktop_portal](https://github.com/canonical/xdg_desktop_portal.dart/blob/e5b0701ca6e2d263def37fdbd2635e5beadf649a/lib/src/xdg_desktop_portal_client.dart#L105-L107).
 
-## Migration from GNOME Libsecret
+## Migration from GNOME libsecret
 
-Since both [Libsecret](https://gnome.pages.gitlab.gnome.org/libsecret/) and this package communicate with the same Secret Service API over D-Bus, compatibility can be retained (i.e., without removing existing user data).
+Since both [libsecret](https://gnome.pages.gitlab.gnome.org/libsecret/) and this package communicate with the same Secret Service API over D-Bus, compatibility can be retained (i.e., without removing existing user data).
 
-For example, the following schema definition in GNOME Libsecret:
+For example, the following schema definition in GNOME libsecret:
 
 ```c
 #include <libsecret/secret.h>
@@ -363,7 +363,7 @@ final lookupAttributes = {
 
 ### [`dbus_secrets`](https://pub.dev/packages/dbus_secrets)
 
-`dbus_secrets` uses a simple [key-value lookup](https://github.com/akshaybabloo/dbus_secrets/blob/31da1752a3dd23bc82691f7a56d3239f6d63eadc/lib/dbus_secrets.dart#L227) and does not use GNOME Libsecret.
+`dbus_secrets` uses a simple [key-value lookup](https://github.com/akshaybabloo/dbus_secrets/blob/31da1752a3dd23bc82691f7a56d3239f6d63eadc/lib/dbus_secrets.dart#L227) and does not use GNOME libsecret.
 
 The lookup attributes:
 
@@ -550,7 +550,7 @@ Dart applications generally fall into the same category due to managed memory an
 
 This limitation may be addressed in the future, but it is not currently planned.
 
-GNOME Libsecret seems to support both plain and `dh-ietf1024-sha256-aes128-cbc-pkcs7` ([source code](https://github.com/GNOME/libsecret/blob/ac1367056d59a86a5f8e8a446f8a6302fed4cf6b/libsecret/secret-session.c#L42-L43)).
+GNOME libsecret seems to support both plain and `dh-ietf1024-sha256-aes128-cbc-pkcs7` ([source code](https://github.com/GNOME/libsecret/blob/ac1367056d59a86a5f8e8a446f8a6302fed4cf6b/libsecret/secret-session.c#L42-L43)).
 
 ### Default collection usage
 
@@ -566,7 +566,7 @@ The library uses the default collection by default. While individual operations 
 
 For most Flutter applications, this limitation is **not relevant**.
 
-Most Flutter plugins and packages store secrets in the default collection as well (`SECRET_COLLECTION_DEFAULT` in GNOME Libsecret):
+Most Flutter plugins and packages store secrets in the default collection as well (`SECRET_COLLECTION_DEFAULT` in GNOME libsecret):
 
 - [`flutter_secure_storage_linux`](https://github.com/juliansteenbakker/flutter_secure_storage/blob/621195b91dd82d05fba6e297a8700c68a72ab031/flutter_secure_storage_linux/linux/include/Secret.hpp#L114-L115)
 - [`simple_secure_storage_linux`](https://github.com/Skyost/SimpleSecureStorage/blob/5940541cbb2a457a43735a6047434354c49bf77e/packages/simple_secure_storage_linux/linux/simple_secure_storage_linux_plugin.cc#L272)
@@ -596,10 +596,10 @@ However, when using `FreeDesktopSecret.storeSecret()` with content type `text/pl
 
 This content type is permitted by the Secret Service specification, which even uses `text/plain; charset=utf8` as [an example](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.3.4.2.2.5.4).
 
-This is a [known GNOME Libsecret issue](https://gitlab.gnome.org/GNOME/libsecret/-/work_items/114). At the time of writing, there is an [open merge request](https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/175) to address it.
+This is a [GNOME libsecret issue](https://gitlab.gnome.org/GNOME/libsecret/-/work_items/114). There is a [merge request](https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/175) to address it.
 
 ## Acknowledgements
 
 - [`package:dbus`](https://pub.dev/packages/dbus) (Dart package)
-- [`org.freedesktop.Secrets.xml`](https://github.com/GNOME/libsecret/blob/main/libsecret/org.freedesktop.Secrets.xml) D-Bus introspection data was copied from the GNOME Libsecret project source code ([accompanying COPYING file](third_party/libsecret/COPYING)).
+- [`org.freedesktop.Secrets.xml`](https://github.com/GNOME/libsecret/blob/main/libsecret/org.freedesktop.Secrets.xml) D-Bus introspection data was copied from the GNOME libsecret project source code ([accompanying COPYING file](third_party/libsecret/COPYING)).
 - [Freedesktop organization](https://freedesktop.org/).

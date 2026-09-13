@@ -306,19 +306,21 @@ void main() {
   });
 
   test('text/plain; charset=utf-8 secrets can be read', () async {
-    final attrs = {'content-type': 'text/plain; charset=utf-8'};
+    const expectedContentType = 'text/plain; charset=utf-8';
+
+    final attrs = {'test': 'content-type utf-8'};
 
     await storeSecretBytes(
       attributes: attrs,
       secretBytes: Uint8List.fromList(utf8.encode('my-secret')),
-      contentType: 'text/plain; charset=utf-8',
+      contentType: expectedContentType,
     );
 
     final secret = await lookupSecret(attributes: attrs);
 
     expect(secret, isNotNull);
     expect(secret!.secretAsText(), 'my-secret');
-    expect(secret.contentType, 'text/plain; charset=utf-8');
+    expect(secret.contentType, expectedContentType);
   });
 
   test(
