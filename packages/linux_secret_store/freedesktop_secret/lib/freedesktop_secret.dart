@@ -25,19 +25,25 @@ export 'src/models/secret_item.dart';
 typedef DBusClientProvider = FutureOr<DBusClient> Function();
 typedef WindowIdProvider = FutureOr<String> Function();
 
-/// A Dart client for the FreeDesktop Secret Service API (`org.freedesktop.secrets`)
+/// {@macro secret_service_client}
+@Deprecated('Use SecretServiceClient instead.')
+typedef FreeDesktopSecret = SecretServiceClient;
+
+/// {@template secret_service_client}
+/// A Dart client for the Freedesktop Secret Service API (`org.freedesktop.secrets`)
 /// for storing and retrieving secrets on Linux.
 ///
-/// A [FreeDesktopSecret] instance is intended to be reused for the lifetime
+/// A [SecretServiceClient] instance is intended to be reused for the lifetime
 /// of the application. Call [initialize] once before use and [close]
 /// when the application shuts down or when it is no longer needed.
 ///
 /// See the official specification:
 /// https://specifications.freedesktop.org/secret-service/latest-single/
-class FreeDesktopSecret {
-  FreeDesktopSecret({
+/// {@endtemplate}
+class SecretServiceClient {
+  /// {@macro secret_service_client}
+  SecretServiceClient({
     DBusClientProvider? dbusClientProvider,
-
     WindowIdProvider? windowIdProvider,
   }) : _dbusClientProvider = dbusClientProvider ?? DBusClient.session,
        _ownsClient = dbusClientProvider == null,

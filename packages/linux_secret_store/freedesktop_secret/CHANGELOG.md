@@ -1,3 +1,7 @@
+## 0.1.5
+
+- Renames the class `FreeDesktopSecret` to `SecretServiceClient`. `FreeDesktopSecret` remains available as a deprecated typedef for backward compatibility. Migrate by replacing `FreeDesktopSecret` with `SecretServiceClient`.
+
 ## 0.1.4
 
 - Fixes a non-HTTPS link in README to satisfy pub static analysis.

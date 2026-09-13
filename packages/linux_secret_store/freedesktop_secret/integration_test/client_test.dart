@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 
 import 'helpers.dart';
 
-/// Integration tests verifying the public behavior of the [FreeDesktopSecret]
+/// Integration tests verifying the public behavior of the [SecretServiceClient]
 /// client against a real Secret Service implementation.
 ///
 /// Requires a running Secret Service implementation.
@@ -23,11 +23,11 @@ import 'helpers.dart';
 /// against a locked collection.
 void main() {
   late DBusClient dbusClient;
-  late FreeDesktopSecret client;
+  late SecretServiceClient client;
 
   setUp(() async {
     dbusClient = DBusClient.session();
-    client = FreeDesktopSecret(dbusClientProvider: () => dbusClient);
+    client = SecretServiceClient(dbusClientProvider: () => dbusClient);
 
     await client.initialize();
 
@@ -40,7 +40,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    final cleanupClient = FreeDesktopSecret();
+    final cleanupClient = SecretServiceClient();
 
     try {
       await cleanupClient.initialize();

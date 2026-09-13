@@ -8,7 +8,7 @@ Map<String, String> testAttributes([
   Map<String, String> attributes = const {},
 ]) => {..._baseAttributes, ...attributes};
 
-Future<void> deleteAllTestSecrets({required FreeDesktopSecret client}) async {
+Future<void> deleteAllTestSecrets({required SecretServiceClient client}) async {
   final attrs = testAttributes();
   await client.deleteSecret(attributes: attrs, duplicateStrategy: .deleteAll);
 

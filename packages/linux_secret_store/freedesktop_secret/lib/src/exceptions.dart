@@ -19,14 +19,14 @@ class SecretServiceSessionNegotiationException
 
 @Deprecated(
   'No longer applicable: https://github.com/EchoEllet/dart-packages/issues/2\n'
-  'FreeDesktopSecret.storeSecret() now automatically creates the default '
+  'SecretServiceClient.storeSecret() now automatically creates the default '
   'collection when the collection parameter is omitted.',
 )
 class SecretServiceCollectionNotFoundException
     implements SecretServiceException {
   @Deprecated(
     'No longer applicable: https://github.com/EchoEllet/dart-packages/issues/2\n'
-    'FreeDesktopSecret.storeSecret() now automatically creates the default '
+    'SecretServiceClient.storeSecret() now automatically creates the default '
     'collection when the collection parameter is omitted.',
   )
   const SecretServiceCollectionNotFoundException({required this.alias});

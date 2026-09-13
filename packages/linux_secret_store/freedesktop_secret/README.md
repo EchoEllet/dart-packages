@@ -38,7 +38,7 @@ Example:
 ```dart
 import 'package:freedesktop_secret/freedesktop_secret.dart';
 
-final client = FreeDesktopSecret();
+final client = SecretServiceClient();
 await client.initialize();
 
 // Replace '<APPLICATION_ID>' with the Linux application ID.
@@ -167,27 +167,27 @@ If a prompt is required, the method awaits until the prompt completes. This happ
 By default, this library passes an empty [window ID](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.3.3.6.4.2.4.1) (`""`) to the Secret Service. If the application can provide a platform-specific window handle, you may supply it to allow the desktop environment to associate prompts with the application's window (for example, presenting them as a transient dialog).
 
 ```dart
-final client = FreeDesktopSecret(
+final client = SecretServiceClient(
   windowIdProvider: () async => ...,
 );
 ```
 
 ## D-Bus session
 
-By default, this library lazily creates a new D-Bus client session ([`DBusClient.session()`](https://pub.dev/documentation/dbus/latest/dbus/DBusClient/DBusClient.session.html)) for each `FreeDesktopSecret` instance.
+By default, this library lazily creates a new D-Bus client session ([`DBusClient.session()`](https://pub.dev/documentation/dbus/latest/dbus/DBusClient/DBusClient.session.html)) for each `SecretServiceClient` instance.
 
 This behavior can be overridden:
 
 ```dart
 
 final dbusClient = DBusClient.session();
-final client = FreeDesktopSecret(
+final client = SecretServiceClient(
   dbusClientProvider: () => dbusClient,
 );
 ```
 
 > [!NOTE]
-> When a non-null `dbusClientProvider` is provided, `FreeDesktopSecret.close()` does not call [`DBusClient.close()`](https://pub.dev/documentation/dbus/latest/dbus/DBusClient/close.html). In that case, the caller retains ownership of the `DBusClient` instance and is responsible for closing it.
+> When a non-null `dbusClientProvider` is provided, `SecretServiceClient.close()` does not call [`DBusClient.close()`](https://pub.dev/documentation/dbus/latest/dbus/DBusClient/close.html). In that case, the caller retains ownership of the `DBusClient` instance and is responsible for closing it.
 >
 > This ownership model is consistent with other Linux D-Bus packages, such as [avahi](https://github.com/canonical/avahi.dart/blob/3ebbfc338d064f2f95843668968d27610c521ed8/lib/src/avahi_client.dart#L11-L23) and [xdg_desktop_portal](https://github.com/canonical/xdg_desktop_portal.dart/blob/e5b0701ca6e2d263def37fdbd2635e5beadf649a/lib/src/xdg_desktop_portal_client.dart#L105-L107).
 
@@ -229,7 +229,7 @@ The equivalent lookup attributes in Dart:
 ```dart
 import 'package:freedesktop_secret/freedesktop_secret.dart';
 
-final FreeDesktopSecret client = ...;
+final SecretServiceClient client = ...;
 
 final secret = await client.lookupSecret(
   attributes: {
@@ -399,12 +399,12 @@ More details in [this section](#xdgschema-attribute-optional).
 
 There are exceptional cases, such as migration from another implementation. In those cases, use the lookup attributes expected by that implementation.
 
-### For library authors: Allow overriding `FreeDesktopSecret`
+### For library authors: Allow overriding `SecretServiceClient`
 
-Prefer explicitly requiring a `FreeDesktopSecret` instance:
+Prefer explicitly requiring a `SecretServiceClient` instance:
 
 ```dart
-void example({required FreeDesktopSecret freeDesktopSecretClient}) {
+void example({required SecretServiceClient secretServiceClient}) {
   // ...
 }
 ```
@@ -412,8 +412,8 @@ void example({required FreeDesktopSecret freeDesktopSecretClient}) {
 Or allow one to be provided while creating a default instance when omitted:
 
 ```dart
-void example({FreeDesktopSecret? freeDesktopSecretClient}) {
-  final client = freeDesktopSecretClient ?? FreeDesktopSecret();
+void example({SecretServiceClient? secretServiceClient}) {
+  final client = secretServiceClient ?? SecretServiceClient();
 }
 ```
 
@@ -587,9 +587,9 @@ For many Flutter applications, this limitation is unlikely to be relevant.
 
 ## Known `secret-tool lookup` CLI issue (GNOME libsecret)
 
-`FreeDesktopSecret.storeSecretText()` stores text secrets with the content type `text/plain`.
+`SecretServiceClient.storeSecretText()` stores text secrets with the content type `text/plain`.
 
-However, when using `FreeDesktopSecret.storeSecret()` with content type `text/plain; charset=utf-8`, older versions of the libsecret tool may fail to read the secret.
+However, when using `SecretServiceClient.storeSecret()` with content type `text/plain; charset=utf-8`, older versions of the libsecret tool may fail to read the secret.
 
 - `secret-tool search` displays these secrets correctly.
 - `secret-tool lookup` rejects the secret with the message `secret does not contain a textual password` because it expects the content type to be exactly `text/plain`.

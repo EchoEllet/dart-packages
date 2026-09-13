@@ -13,11 +13,11 @@ import 'libsecret_interop.dart';
 ///   - `secret-tool` CLI (provided by GNOME libsecret).
 ///   - A running Secret Service implementation.
 void main() {
-  late FreeDesktopSecret client;
+  late SecretServiceClient client;
   late LibsecretInterop libsecret;
 
   setUp(() async {
-    client = FreeDesktopSecret();
+    client = SecretServiceClient();
     libsecret = const LibsecretInteropSecretTool();
 
     await client.initialize();
@@ -30,7 +30,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    final cleanupClient = FreeDesktopSecret();
+    final cleanupClient = SecretServiceClient();
 
     try {
       await cleanupClient.initialize();
@@ -48,7 +48,7 @@ void main() {
     'account': 'test-user',
   });
 
-  group('GNOME libsecret -> FreeDesktopSecret', () {
+  group('GNOME libsecret -> $SecretServiceClient', () {
     test('store -> lookup', () async {
       final attributes = sampleAttributes;
 
@@ -75,7 +75,7 @@ void main() {
     //     attributes: attributes,
     //   );
 
-    //   // TODO: Uncomment this test once searchSecrets/lookupSecrets is implemented in FreeDesktopSecret
+    //   // TODO: Uncomment this test once searchSecrets/lookupSecrets is implemented in SecretServiceClient
     //   final items = await client.searchSecrets(attributes: attributes);
 
     //   expect(items, hasLength(1));
@@ -103,7 +103,7 @@ void main() {
     });
   });
 
-  group('FreeDesktopSecret -> GNOME libsecret', () {
+  group('$SecretServiceClient -> GNOME libsecret', () {
     test('store -> lookup', () async {
       final attributes = sampleAttributes;
 

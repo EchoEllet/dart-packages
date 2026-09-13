@@ -3,7 +3,7 @@
 import 'package:freedesktop_secret/freedesktop_secret.dart';
 
 void main() async {
-  final client = FreeDesktopSecret();
+  final client = SecretServiceClient();
 
   await client.initialize();
 
