@@ -6,6 +6,4 @@ example/macos/
 example/web/
 example/windows/
 example/linux/
-example/test_driver/
-example/integration_test/
 example/analysis_options.yaml

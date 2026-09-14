@@ -14,5 +14,12 @@ dependencies:
   flutter_secure_storage_linux_secret_service:
     path: ../
 
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  test: ^1.31.1
+  flutter_secure_storage_platform_interface: ^2.1.0
+  freedesktop_secret: ^0.1.5
+
 flutter:
   uses-material-design: true
