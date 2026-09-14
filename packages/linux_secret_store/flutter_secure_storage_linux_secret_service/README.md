@@ -11,8 +11,8 @@ See also [`package:freedesktop_secret`](https://pub.dev/packages/freedesktop_sec
   - Does not require additional system packages to build or run the application (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
   - Provides consistent error handling, allowing applications to handle recoverable issues by catching `Exception`.
 - Uses the standard Secret Service API, which is the primary API used by GNOME libsecret, making it possible to retain compatibility with secrets stored by [`flutter_secure_storage_linux`](https://pub.dev/packages/flutter_secure_storage_linux).
-- Handles prompts, unlocking the default collection ([also known](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) as a keyring or wallet) and items when needed.
-- Automatically creates the default collection when it does not exist (e.g., on fresh Linux installations).
+- Automatic handling of prompts and unlocking the default collection ([also known](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) as a keyring or wallet) and the secret item when needed.
+- Automatic creation of the default collection when it does not exist, such as on fresh Linux installations.
 
 ## Requirements
 
