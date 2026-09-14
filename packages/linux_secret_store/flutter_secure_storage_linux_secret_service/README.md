@@ -1,13 +1,15 @@
 # flutter_secure_storage_linux_secret_service
 
-A Linux implementation of the [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage) plugin using the Secret Service API ([`org.freedesktop.secrets`](https://specifications.freedesktop.org/secret-service/latest-single/)).
+A Linux implementation of the [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage) plugin using the standard [Secret Service API](https://specifications.freedesktop.org/secret-service/latest-single/) through a pure Dart D-Bus client.
+It provides an alternative to the native `libsecret`-based `flutter_secure_storage_linux` implementation without requiring `libsecret` system packages to build or run the application.
 
-See also [`package:freedesktop_secret`](https://pub.dev/packages/freedesktop_secret), which provides the underlying pure Dart implementation of the Secret Service API used by this package.
+See also [`package:freedesktop_secret`](https://pub.dev/packages/freedesktop_secret), which provides the underlying Dart client implementation of the Secret Service API used by this package.
 
 ## Features
 
 - Pure Dart implementation using D-Bus directly.
-- Does not require additional system packages to build or run the application (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
+  - Does not require additional system packages to build or run the application (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
+  - Provides consistent error handling, allowing applications to handle recoverable issues by catching `Exception`.
 - Uses the standard Secret Service API, which is the primary API used by GNOME libsecret, making it possible to retain compatibility with secrets stored by [`flutter_secure_storage_linux`](https://pub.dev/packages/flutter_secure_storage_linux).
 - Handles prompts, unlocking the default collection ([also known](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) as a keyring or wallet) and items when needed.
 - Automatically creates the default collection when it does not exist (e.g., on fresh Linux installations).

@@ -18,7 +18,8 @@ This package communicates with the [Secret Service API](https://specifications.f
 ## Features
 
 - Pure Dart implementation using D-Bus directly.
-- Does not require additional system packages to build or run the application (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
+  - Does not require additional system packages to build or run the application (e.g., `libsecret-1-0` or `libsecret-1-dev` on Ubuntu).
+  - Provides consistent error handling, allowing applications to handle recoverable issues by catching `Exception`.
 - Uses the standard Secret Service API, which is the primary API used by GNOME libsecret, making it possible to retain compatibility without data migration ([more details](#migration-from-gnome-libsecret)).
 - Handles prompts, unlocking the default collection ([also known](https://specifications.freedesktop.org/secret-service/latest-single/#id-1.2.4) as a keyring or wallet) and items when needed.
 - Automatically creates the default collection when it does not exist (e.g., on fresh Linux installations).

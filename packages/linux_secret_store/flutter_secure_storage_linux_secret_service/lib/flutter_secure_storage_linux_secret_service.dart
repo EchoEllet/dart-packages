@@ -7,7 +7,7 @@ import 'package:linux_application_id/linux_application_id.dart';
 typedef _StorageMap = Map<String, String>;
 
 /// A Linux implementation of [FlutterSecureStoragePlatform] using the
-/// Secret Service API ([`org.freedesktop.secrets`](https://specifications.freedesktop.org/secret-service/latest-single/)).
+/// [Secret Service API](https://specifications.freedesktop.org/secret-service/latest-single/).
 class FlutterSecureStorageLinuxSecretService
     extends FlutterSecureStoragePlatform {
   /// Registers this class as the default instance of [FlutterSecureStoragePlatform].
