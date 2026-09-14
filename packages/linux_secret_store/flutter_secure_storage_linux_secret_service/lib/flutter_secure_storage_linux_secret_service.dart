@@ -67,9 +67,8 @@ class FlutterSecureStorageLinuxSecretService
       return;
     }
 
-    final legacyAttributes = _legacyLookupAttributes();
     final legacySecret = await _client.lookupSecret(
-      attributes: legacyAttributes,
+      attributes: _legacyLookupAttributes(),
       duplicateStrategy: .newestCreated,
     );
     if (legacySecret == null) {
@@ -80,8 +79,8 @@ class FlutterSecureStorageLinuxSecretService
 
     if (deleteLegacyData) {
       await _client.deleteSecret(
-        attributes: legacyAttributes,
-        duplicateStrategy: .newestCreated,
+        attributes: legacySecret.attributes,
+        duplicateStrategy: .throwException,
       );
     }
   }
