@@ -2,9 +2,8 @@ A Linux implementation of [`flutter_secure_storage`](https://pub.dev/packages/fl
 
 ## Usage
 
-Register this implementation when the application should use the XDG Desktop
-Secret Portal API (`org.freedesktop.portal.Secret`), such as when running in a
-sandboxed environment (e.g., Flatpak or Snap).
+Use this implementation when the application should use the Secret Portal API,
+such as when running in a sandboxed environment (e.g., Flatpak or Snap).
 
 ```dart
 import 'package:flutter_secure_storage_linux_portal/flutter_secure_storage_linux_portal.dart';
@@ -17,7 +16,7 @@ FlutterSecureStorageLinuxPortal.registerWith();
 
 ## Example
 
-The following example registers this implementation when running in Flatpak.
+The following example uses this implementation when running in Flatpak or Snap.
 
 ```dart
 import 'dart:io';
@@ -25,18 +24,24 @@ import 'dart:io';
 import 'package:flutter_secure_storage_linux_portal/flutter_secure_storage_linux_portal.dart';
 
 if (Platform.isLinux) {
-  final isFlatpak =
-      Platform.environment.containsKey('FLATPAK_ID') ||
-      Platform.environment['container'] == 'flatpak';
+  final environment = Platform.environment;
 
-  if (isFlatpak) {
+  final isFlatpak =
+      environment.containsKey('FLATPAK_ID') ||
+      environment['container'] == 'flatpak';
+  final isSnap =
+      environment.containsKey('SNAP') ||
+      environment.containsKey('SNAP_NAME');
+  final usePortal = isFlatpak || isSnap;
+
+  if (usePortal) {
     FlutterSecureStorageLinuxPortal.registerWith();
   }
 }
 ```
 
 > [!TIP]
-> This is only an example of when to register the implementation. Applications
+> This is only an example of when to use the implementation. Applications
 may choose different conditions based on their environment or requirements.
 
 ## File Path

@@ -1,17 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_secure_storage_linux_secret_service/flutter_secure_storage_linux_secret_service.dart';
-// ignore: depend_on_referenced_packages
-import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage_platform_interface.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
-  final secureStorageImplementation = FlutterSecureStoragePlatform.instance;
-  if (secureStorageImplementation is! FlutterSecureStorageLinuxSecretService) {
-    throw Exception(
-      'Expected the flutter_secure_storage platform implementation to be $FlutterSecureStorageLinuxSecretService',
-    );
-  }
-
   runApp(const MainApp(secureStorage: FlutterSecureStorage()));
 }
 

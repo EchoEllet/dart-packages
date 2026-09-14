@@ -3,6 +3,8 @@ import 'package:flutter_secure_storage_linux_portal/flutter_secure_storage_linux
 import 'package:material_ui/material_ui.dart';
 
 void main() {
+  // For testing purposes, this is always registered.
+  // For a real cross-platform app, consider detecting Flatpak/Snap.
   FlutterSecureStorageLinuxPortal.registerWith();
 
   runApp(const MainApp(secureStorage: FlutterSecureStorage()));
