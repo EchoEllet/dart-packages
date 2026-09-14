@@ -8,6 +8,7 @@ Contains simple Dart/Flutter packages:
 - [`json_safe`](packages/json_safe)
 - [`system_accent_color`](packages/system_accent_color)
 - [`dart_build_constants`](packages/dart_build_constants)
+- [`flutter_secure_storage_linux_secret_service`](packages/linux_secret_store/flutter_secure_storage_linux_secret_service)
 - [`freedesktop_secret`](packages/linux_secret_store/freedesktop_secret/)
 - [`xdg_secret_portal_store`](packages/linux_secret_store/xdg_secret_portal_store)
 - [`xdg_secret_portal_store_default`](packages/linux_secret_store/xdg_secret_portal_store_default)
