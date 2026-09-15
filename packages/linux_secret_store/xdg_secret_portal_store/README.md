@@ -164,11 +164,11 @@ final store = XdgSecretPortalStore(
 This package cannot retrieve secrets stored by
 [GNOME libsecret](https://gitlab.gnome.org/GNOME/libsecret).
 
-GNOME libsecret supports multiple storage backends. The two main ones are:
+GNOME libsecret supports different storage APIs. The two main ones are:
 
 > If available, secrets are stored in the freedesktop secret service. Otherwise, secrets are stored in a file that is encrypted using a master secret that was provided by the secret portal.
 
-If GNOME libsecret is using the Secret Portal backend (see [secret-backend.c#L156](https://github.com/GNOME/libsecret/blob/28486191b2d2cf1599cd3c051b304fac927e24cf/libsecret/secret-backend.c#L156)), it stores encrypted secrets in its own encrypted file format. According to
+If GNOME libsecret is using the Secret Portal API (see [secret-backend.c#L156](https://github.com/GNOME/libsecret/blob/28486191b2d2cf1599cd3c051b304fac927e24cf/libsecret/secret-backend.c#L156)), it stores encrypted secrets in its own encrypted file format. According to
 [this source](https://github.com/GNOME/libsecret/blob/311ca720dd5da208e6ca1364e690026ab0248476/libsecret/secret-file-backend.c#L80),
 the data is stored in:
 
@@ -176,8 +176,8 @@ the data is stored in:
 $XDG_DATA_HOME/keyrings/<default-collection>.keyring
 ```
 
-If GNOME libsecret is using the Secret Service backend, this package is also not interoperable. However,
-[`package:freedesktop_secret`](https://pub.dev/packages/freedesktop_secret) is interoperable with GNOME libsecret when using that backend.
+If GNOME libsecret is using the Secret Service API, this package is also not interoperable. However,
+[`package:freedesktop_secret`](https://pub.dev/packages/freedesktop_secret) is interoperable with GNOME libsecret when using that API.
 
 ## See also
 

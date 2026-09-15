@@ -44,15 +44,32 @@ if (Platform.isLinux) {
 > This is only an example of when to use the implementation. Applications
 may choose different conditions based on their environment or requirements.
 
-## File Path
+## Implementation Details
 
-Stores the secrets encrypted in [a file](https://pub.dev/packages/xdg_secret_portal_store#storage-format):
+The Secret Portal API [provides a unique master secret](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html#org-freedesktop-portal-secret-retrievesecret) for a sandboxed application.
+
+Unlike the Secret Service API, it does not provide secure storage itself. Instead, applications can use the master secret to encrypt secrets and store them in a file, for example.
+
+### File Path
+
+The secrets are stored encrypted in [a file](https://pub.dev/packages/xdg_secret_portal_store#storage-format):
 
 `$XDG_DATA_HOME/$APPLICATION_ID/xdg_secret_portal_store/secrets.json`.
 
-## Cryptography
+### Cryptography
 
 For [security details](https://pub.dev/packages/xdg_secret_portal_store_default#cryptography).
+
+### Not interoperable with GNOME libsecret
+
+This implementation cannot retrieve secrets stored by
+[`flutter_secure_storage_linux`](https://pub.dev/packages/flutter_secure_storage_linux) or [GNOME libsecret](https://gitlab.gnome.org/GNOME/libsecret).
+
+For more details, refer to [this section](https://pub.dev/packages/xdg_secret_portal_store#not-interoperable-with-gnome-libsecret).
+
+> [!TIP]
+> [`flutter_secure_storage_linux_secret_service`](https://pub.dev/packages/flutter_secure_storage_linux_secret_service) is interoperable and can retrieve secrets stored by
+[`flutter_secure_storage_linux`](https://pub.dev/packages/flutter_secure_storage_linux).
 
 ## Historical Background
 
