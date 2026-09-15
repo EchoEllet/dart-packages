@@ -60,6 +60,11 @@ The secrets are stored encrypted in [a file](https://pub.dev/packages/xdg_secret
 
 For [security details](https://pub.dev/packages/xdg_secret_portal_store_default#cryptography).
 
+> [!IMPORTANT]
+> **Disclaimer:** Support for this library is given as _best effort_.
+>
+> This library has not been reviewed or vetted by security professionals.
+
 ### Not interoperable with GNOME libsecret
 
 This implementation cannot retrieve secrets stored by
