@@ -54,7 +54,7 @@ Unlike the Secret Service API, it does not provide secure storage itself. Instea
 
 The secrets are stored encrypted in [a file](https://pub.dev/packages/xdg_secret_portal_store#storage-format):
 
-`$XDG_DATA_HOME/$APPLICATION_ID/xdg_secret_portal_store/secrets.json`.
+`$XDG_DATA_HOME/$APPLICATION_ID/secure_storage/secrets.json`.
 
 ### Cryptography
 

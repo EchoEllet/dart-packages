@@ -12,7 +12,7 @@ void main() async {
 
   try {
     final file = File(
-      '${dataHome.path}/org.example.xdg_secret_portal_store_example/xdg_secret_portal_store/secrets.json',
+      '${dataHome.path}/org.example.xdg_secret_portal_store_example/secure_storage/secrets.json',
     );
 
     final store = XdgSecretPortalStore(

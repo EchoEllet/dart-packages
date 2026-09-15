@@ -30,7 +30,7 @@ class FlutterSecureStorageLinuxPortal extends FlutterSecureStoragePlatform {
       masterSecretRetriever: client.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(
         File(
-          '${xdg_directories.dataHome.path}/$_applicationId/xdg_secret_portal_store/secrets.json',
+          '${xdg_directories.dataHome.path}/$_applicationId/secure_storage/secrets.json',
         ),
       ),
       crypto: SecretStoreCryptoDefault(),

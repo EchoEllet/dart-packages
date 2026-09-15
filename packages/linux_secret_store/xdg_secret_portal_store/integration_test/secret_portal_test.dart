@@ -39,7 +39,7 @@ void main() {
 
   setUp(() async {
     storeFile = File(
-      '${dataHome.path}/org.example.xdg_secret_portal_store_example/xdg_secret_portal_store/secrets.json',
+      '${dataHome.path}/org.example.xdg_secret_portal_store_example/secure_storage/secrets.json',
     );
 
     await deleteStoreFile();

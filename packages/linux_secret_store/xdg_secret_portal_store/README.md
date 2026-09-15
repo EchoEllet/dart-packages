@@ -118,7 +118,7 @@ the encrypted secret store in their own application data directory.
 
 A typical XDG-compatible layout is:
 
-`$XDG_DATA_HOME/$APPLICATION_ID/xdg_secret_portal_store/secrets.json`.
+`$XDG_DATA_HOME/$APPLICATION_ID/secure_storage/secrets.json`.
 
 For example, [`path_provider`](https://pub.dev/packages/path_provider) can be used:
 
@@ -130,7 +130,7 @@ import 'package:path/path.dart' as p;
 
 final filePath = p.join(
   await getApplicationSupportPath(),
-  'xdg_secret_portal_store',
+  'secure_storage',
   'secrets.json',
 );
 
