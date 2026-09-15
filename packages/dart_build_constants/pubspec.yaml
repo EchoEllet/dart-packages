@@ -1,5 +1,5 @@
 name: dart_build_constants
-description: |
+description: >
   Declares Flutter-compatible build constants without a Flutter dependency.
   The constants are based on Dart's compile-time environment values.
 version: 1.0.0

@@ -15,6 +15,7 @@ typedef MasterSecretRetriever = Future<Uint8List> Function({String? token});
 /// A map of secret names to secret values.
 typedef SecretMap = Map<String, String>;
 
+/// {@template xdg_secret_portal_store}
 /// A helper for storing application secrets in an encrypted file using the
 /// master secret provided by the XDG Desktop Portal Secret API.
 ///
@@ -41,7 +42,9 @@ typedef SecretMap = Map<String, String>;
 /// used to encrypt and decrypt the secret store.
 ///
 /// Call [loadMasterSecret] before using [read] or [write].
+/// {@endtemplate}
 class XdgSecretPortalStore {
+  /// {@macro xdg_secret_portal_store}
   XdgSecretPortalStore({
     required MasterSecretRetriever masterSecretRetriever,
     required SecretStorePersistence persistence,

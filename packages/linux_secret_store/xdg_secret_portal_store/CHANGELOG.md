@@ -1,3 +1,7 @@
+## 0.2.2
+
+- Updates README to keep it consistent with [`package:flutter_secure_storage_linux_portal`](http://pub.dev/packages/flutter_secure_storage_linux_portal).
+
 ## 0.2.1
 
 - Fixes a non-HTTPS link in CHANGELOG to satisfy pub static analysis.
