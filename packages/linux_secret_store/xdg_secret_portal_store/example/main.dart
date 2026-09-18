@@ -8,7 +8,7 @@ import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
 import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
 void main() async {
-  final portal = XdgDesktopPortalClient();
+  final client = XdgDesktopPortalClient();
 
   try {
     final file = File(
@@ -16,7 +16,7 @@ void main() async {
     );
 
     final store = XdgSecretPortalStore(
-      masterSecretRetriever: portal.secret.retrieveSecret,
+      masterSecretRetriever: client.secret.retrieveSecret,
       persistence: SecretStorePersistenceFile(file),
       crypto: SecretStoreCryptoDefault(),
     );
@@ -34,6 +34,6 @@ void main() async {
 
     print('Password has been updated.');
   } finally {
-    await portal.close();
+    await client.close();
   }
 }

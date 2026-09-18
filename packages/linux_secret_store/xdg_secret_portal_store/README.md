@@ -2,23 +2,36 @@ A helper library for storing application secrets in an encrypted file using
 the master secret provided by the XDG Desktop Portal Secret API. Designed to
 complement [`package:xdg_desktop_portal`](https://pub.dev/packages/xdg_desktop_portal).
 
+> [!TIP]
+> This package is intended to be a helper/complementary library rather than a portal client.
+>
+> Unlike the Secret Service API, the [Secret Portal API](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html) provides a master secret. It is not secure storage itself. Instead, applications can use the provided master secret to encrypt secrets and store them in a file, for example.
+>
+> `package:xdg_desktop_portal` already implements the Secret Portal
+> ([`XdgSecretPortal.retrieveSecret()`](https://pub.dev/documentation/xdg_desktop_portal/latest/xdg_desktop_portal/XdgSecretPortal/retrieveSecret.html)).
+>
+> This package provides a convenient encrypted secret store built on top
+> of the portal-provided master secret.
+
+## Usage
+
 To add the dependencies:
 
 ```shell
 dart pub add xdg_secret_portal_store xdg_secret_portal_store_default xdg_desktop_portal
 ```
 
-## Usage
+Example usage:
 
 ```dart
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 import 'package:xdg_secret_portal_store/xdg_secret_portal_store.dart';
 import 'package:xdg_secret_portal_store_default/xdg_secret_portal_store_default.dart';
 
-final portalClient = XdgDesktopPortalClient();
+final client = XdgDesktopPortalClient();
 
 final store = XdgSecretPortalStore(
-  masterSecretRetriever: portalClient.secret.retrieveSecret,
+  masterSecretRetriever: client.secret.retrieveSecret,
   persistence: SecretStorePersistenceFile(
     // Read the "File Path" section for details.
     File('/path/to/application/data/secrets.json'),
@@ -35,21 +48,8 @@ secrets['password'] = '123';
 await store.write(secrets);
 
 // Closes the client when no longer needed.
-await portalClient.close();
+await client.close();
 ```
-
-> [!TIP]
-> This package is intended to be a helper library rather than a portal client.
->
-> The portal [`org.freedesktop.portal.Secret`](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html)
-> provides a master secret for a sandboxed application.
->
-> `package:xdg_desktop_portal` already implements the secret portal
-> ([`XdgSecretPortal`](https://pub.dev/documentation/xdg_desktop_portal/latest/xdg_desktop_portal/XdgSecretPortal-class.html)).
->
-> Unlike `org.freedesktop.secrets`, the Secret Portal is not a secure storage API
-> itself. This package provides a convenient encrypted secret store built on top
-> of the portal-provided master secret.
 
 ## Cryptography
 
@@ -164,7 +164,7 @@ final store = XdgSecretPortalStore(
 This package cannot retrieve secrets stored by
 [GNOME libsecret](https://gitlab.gnome.org/GNOME/libsecret).
 
-GNOME libsecret supports different storage APIs. The two main ones are:
+GNOME libsecret supports different secret storage APIs. According to its README, the two main ones are the Secret Service and the Secret Portal:
 
 > If available, secrets are stored in the freedesktop secret service. Otherwise, secrets are stored in a file that is encrypted using a master secret that was provided by the secret portal.
 

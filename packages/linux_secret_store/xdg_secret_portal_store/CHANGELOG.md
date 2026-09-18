@@ -1,6 +1,10 @@
+## 0.2.3
+
+- Updates and improves README documentation.
+
 ## 0.2.2
 
-- Updates README to keep it consistent with [`package:flutter_secure_storage_linux_portal`](http://pub.dev/packages/flutter_secure_storage_linux_portal).
+- Updates README to keep it consistent with [`package:flutter_secure_storage_linux_portal`](https://pub.dev/packages/flutter_secure_storage_linux_portal).
 
 ## 0.2.1
 
