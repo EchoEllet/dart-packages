@@ -15,11 +15,12 @@ export 'package:json_safe/json_safe.dart'
         JsonObjectExpectedException,
         JsonParseException;
 
-/// An HTTP client for APIs that return responses using the [Result] pattern.
+/// An HTTP client for APIs that return structured JSON responses.
 ///
 /// Provides the following on top of a standard HTTP client:
 ///
-/// * Wraps all responses in a [Result], enforce handling transport-level issues.
+/// * Represents 2xx and non-2xx responses as [HttpStatusSuccess] and
+///   [HttpStatusError], respectively.
 ///
 /// * When using [requestJson], automatically adds the `Accept: application/json` header,
 ///   and expects responses to be always JSON.
