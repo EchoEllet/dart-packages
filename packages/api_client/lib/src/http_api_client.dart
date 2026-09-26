@@ -19,8 +19,8 @@ export 'package:json_safe/json_safe.dart'
 ///
 /// Provides the following on top of a standard HTTP client:
 ///
-/// * Represents 2xx and non-2xx responses as [HttpStatusSuccess] and
-///   [HttpStatusError], respectively.
+/// * Represents responses as [HttpStatusSuccess] for 2xx status codes and
+///   [HttpStatusError] for non-2xx status codes.
 ///
 /// * When using [requestJson], automatically adds the `Accept: application/json` header,
 ///   and expects responses to be always JSON.
