@@ -60,6 +60,43 @@ final class HttpApiClientDart implements HttpApiClient {
     );
   }
 
+  // TODO: This method currently lacks automated tests.
+  @override
+  Future<HttpStatusResult<Stream<List<int>>, E>> requestStreamed<E>(
+    Uri url, {
+    required HttpMethod method,
+    Map<String, String>? headers,
+    required JsonResponseDeserializer<E> deserializeError,
+  }) async {
+    final response = await _client.send(
+      http.Request(method.httpMethodName(), url)..headers.addAll(headers ?? {}),
+    );
+
+    if (HttpStatusRanges.isIn2xx(response.statusCode)) {
+      return HttpStatusSuccess(
+        HttpResponse(
+          body: response.stream,
+          statusCode: response.statusCode,
+          headers: response.headers,
+          reasonPhrase: response.reasonPhrase,
+        ),
+      );
+    }
+
+    final unstreamedResponse = await http.Response.fromStream(response);
+
+    final errorResponse = _mapHttpResponse(unstreamedResponse);
+
+    return HttpStatusError(
+      errorResponse._mapBody(
+        json.deserializeJson(
+          errorResponse.body,
+          (json) => deserializeError(errorResponse._mapBody(json)),
+        ),
+      ),
+    );
+  }
+
   @override
   Future<HttpStatusResult<String, String>> request(
     Uri url, {

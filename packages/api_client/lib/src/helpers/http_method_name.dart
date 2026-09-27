@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:http_method_enum/http_method_enum.dart';
 
 extension HttpMethodName on HttpMethod {

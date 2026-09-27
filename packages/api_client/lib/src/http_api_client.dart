@@ -67,10 +67,9 @@ export 'package:json_safe/json_safe.dart'
 ///   For more info, visit the file that exports [http.MultipartFile] which is
 ///   the same file that defines [MultipartBody].
 ///
-/// * Does not support lazy streaming of request or response bodies,
-///   as API clients typically do not require it. Responses are always
-///   returned as a raw [String] with [request], or as a decoded class
-///   with [requestJson] rather than raw bytes.
+/// * [requestStreamed] supports lazy streaming of successful response bodies.
+///   Successful responses are returned as a stream of raw bytes, while
+///   non-successful responses are still buffered and deserialized as JSON.
 abstract interface class HttpApiClient {
   /// Sends an HTTP request and deserializes the JSON response.
   ///
@@ -100,6 +99,27 @@ abstract interface class HttpApiClient {
     Map<String, String>? headers,
     RequestBody? body,
     required JsonResponseDeserializer<S> deserializeSuccess,
+    required JsonResponseDeserializer<E> deserializeError,
+  });
+
+  /// Sends an HTTP request and streams the response body for successful responses.
+  ///
+  /// Successful (2xx) responses are returned as a [Stream] of raw bytes without
+  /// buffering the response body in memory. Non-successful responses are
+  /// buffered and deserialized as JSON using [deserializeError].
+  ///
+  /// [deserializeError] receives the [HttpResponse] with the decoded JSON as a
+  /// [JsonMap].
+  ///
+  /// Throws [JsonParseException] if a non-successful response contains invalid
+  /// or malformed JSON, or does not match the expected error model structure.
+  ///
+  /// {@macro requestCommon}
+  Future<HttpStatusResult<Stream<List<int>>, E>> requestStreamed<E>(
+    Uri url, {
+    required HttpMethod method,
+    Map<String, String>? headers,
+    // TODO: Consider adding "RequestBody? body". For now, this method is intended for your file-download use case
     required JsonResponseDeserializer<E> deserializeError,
   });
 
