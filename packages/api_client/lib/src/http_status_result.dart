@@ -23,7 +23,7 @@ final class HttpStatusSuccess<S, E> extends HttpStatusResult<S, E> {
   final HttpResponse<S> response;
 
   @override
-  String toString() => 'HttpStatusSuccess<$S>(responses: $response)';
+  String toString() => 'HttpStatusSuccess<$S>(response: $response)';
 }
 
 /// Non-2xx HTTP response.
@@ -34,5 +34,5 @@ final class HttpStatusError<S, E> extends HttpStatusResult<S, E> {
   final HttpResponse<E> response;
 
   @override
-  String toString() => 'HttpStatusError<$E>(responses: $response)';
+  String toString() => 'HttpStatusError<$E>(response: $response)';
 }

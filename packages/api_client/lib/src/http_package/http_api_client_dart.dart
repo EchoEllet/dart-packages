@@ -79,6 +79,7 @@ final class HttpApiClientDart implements HttpApiClient {
           statusCode: response.statusCode,
           headers: response.headers,
           reasonPhrase: response.reasonPhrase,
+          contentLength: response.contentLength,
         ),
       );
     }
@@ -266,6 +267,7 @@ final class HttpApiClientDart implements HttpApiClient {
     body: response.body, // A computed getter, not a field.
     reasonPhrase: response.reasonPhrase,
     headers: response.headers,
+    contentLength: response.contentLength,
   );
 
   HttpStatusResult<T, T> _mapResponseToStatusResult<T>(
@@ -293,6 +295,7 @@ extension _MapResponse<T> on HttpResponse<T> {
       statusCode: statusCode,
       headers: headers,
       reasonPhrase: reasonPhrase,
+      contentLength: contentLength,
     );
   }
 }

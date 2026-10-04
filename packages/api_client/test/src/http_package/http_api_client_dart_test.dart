@@ -797,6 +797,7 @@ _HttpResponse _httpResponse({
   statusCode: statusCode,
   headers: headers,
   reasonPhrase: reasonPhrase,
+  contentLength: null,
 );
 
 class _MockHttpClient extends Mock implements http.Client {}

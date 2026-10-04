@@ -12,11 +12,13 @@ JsonHttpResponse dummyJsonHttpResponse({
   int? statusCode,
   Map<String, String>? headers,
   String? reasonPhrase,
+  int? contentLength,
 }) => HttpResponse(
   body: body ?? {},
   statusCode: statusCode ?? 200,
   headers: headers ?? {},
   reasonPhrase: reasonPhrase ?? 'OK',
+  contentLength: contentLength,
 );
 
 @visibleForTesting
@@ -25,9 +27,11 @@ HttpResponse<T> dummyHttpResponse<T>({
   int? statusCode,
   Map<String, String>? headers,
   String? reasonPhrase,
+  int? contentLength,
 }) => HttpResponse(
   body: body,
   statusCode: statusCode ?? 200,
   headers: headers ?? {},
   reasonPhrase: reasonPhrase ?? 'OK',
+  contentLength: contentLength,
 );
