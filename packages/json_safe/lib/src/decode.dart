@@ -20,11 +20,10 @@ JsonMap decodeJsonStringToMap(String input) {
       throw JsonObjectExpectedException(input, decoded.runtimeType);
     }
     return decoded;
-  } on FormatException catch (e) {
-    throw JsonDecodingException(
-      source: input,
-      reason: e.message,
-      offset: e.offset,
+  } on FormatException catch (e, stackTrace) {
+    Error.throwWithStackTrace(
+      JsonDecodingException(source: input, reason: e.message, offset: e.offset),
+      stackTrace,
     );
   }
 }
@@ -70,8 +69,11 @@ T deserializeJsonMap<T>(
     // fromJson() often uses 'as' and '!' operators, which can throw if the JSON
     // does not match the expected structure. This workaround catches those errors as failures.
     // ignore: avoid_catching_errors
-  } on TypeError catch (e) {
-    throw JsonDeserializationException(decodedJson: map, reason: e.toString());
+  } on TypeError catch (e, stackTrace) {
+    Error.throwWithStackTrace(
+      JsonDeserializationException(decodedJson: map, reason: e.toString()),
+      stackTrace,
+    );
   }
 }
 
