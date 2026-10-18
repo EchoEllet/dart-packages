@@ -1,3 +1,7 @@
+## 0.1.6
+
+- Updates the `dbus` dependency constraint to support `0.7.14` and `0.8.0`.
+
 ## 0.1.5
 
 - Renames the class `FreeDesktopSecret` to `SecretServiceClient`. `FreeDesktopSecret` remains available as a deprecated typedef for backward compatibility. Migrate by replacing `FreeDesktopSecret` with `SecretServiceClient`.
