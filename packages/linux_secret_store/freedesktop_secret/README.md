@@ -1,19 +1,16 @@
 # Dart Client for Linux Secret Service
 
-A Dart client implementation for the freedesktop.org Secret Service API
-([`org.freedesktop.secrets`](https://specifications.freedesktop.org/secret-service/latest-single/))
+A Dart client implementation of the Freedesktop [Secret Service API](https://specifications.freedesktop.org/secret-service/latest-single/)
 for storing and retrieving secrets through a Secret Service provider.
 
-## Context
+## Overview
 
-On Linux, XDG is a set of specifications developed by [freedesktop.org](https://freedesktop.org/) to improve interoperability and provide shared technologies across desktop environments.
-
-This package communicates with the [Secret Service API](https://specifications.freedesktop.org/secret-service/latest/) over D-Bus, making it compatible with any compliant Secret Service implementation (e.g., GNOME Keyring, KDE Wallet).
+This package communicates over D-Bus, using the `org.freedesktop.secrets` interface, making it compatible with any compliant Secret Service implementation (e.g., GNOME Keyring, KDE Wallet).
 
 > [!TIP]
-> This package is focused on the Secret Service API (`org.freedesktop.secrets`).
+> This package is focused on the Secret Service API.
 >
-> The [Secret Portal](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html) (`org.freedesktop.portal.Secret`) is a separate API with different semantics and requirements, including client-side encryption. For applications targeting the Secret Portal, see [`package:xdg_secret_portal_store`](https://pub.dev/packages/xdg_secret_portal_store).
+> The [Secret Portal](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Secret.html) is a separate API with different semantics and requirements, including client-side encryption. For applications targeting the Secret Portal, see [`package:xdg_secret_portal_store`](https://pub.dev/packages/xdg_secret_portal_store).
 
 ## Features
 
@@ -99,9 +96,7 @@ This library is intended to work with Secret Service implementations that comply
 
 This package is feature-complete for its intended scope and has been verified through [integration testing](./integration_test/) against multiple Secret Service implementations.
 
-However, the public API is not yet considered stable. Minor breaking API changes may still occur before the first stable (`1.0.0`) release as the API is refined based on real-world usage and feedback.
-
-All breaking changes will be documented in `CHANGELOG.md`.
+The public API is not yet considered fully stable. Minor breaking API changes may still occur before the first stable (`1.0.0`) release as the API is refined based on real-world usage and feedback. All breaking changes will be documented in `CHANGELOG.md`.
 
 ## Lookup attributes
 
@@ -248,10 +243,12 @@ The `xdg:schema` attribute corresponds to the Libsecret schema name (Libsecret [
 > [!TIP]
 > The lookup attributes below reflect internal implementation details of the respective plugins and may change over time.
 
-### [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage)
+### `flutter_secure_storage`
 
-> [!TIP]
-> Use [`package:flutter_secure_storage_linux_secret_service`](https://pub.dev/packages/flutter_secure_storage_linux_secret_service) for a `flutter_secure_storage` Linux implementation that uses `freedesktop_secret`.
+Use [`package:flutter_secure_storage_linux_secret_service`](https://pub.dev/packages/flutter_secure_storage_linux_secret_service) for a `flutter_secure_storage` Linux implementation that uses `freedesktop_secret`.
+
+<details>
+<summary>Implementation details</summary>
 
 [`flutter_secure_storage_linux`](https://github.com/juliansteenbakker/flutter_secure_storage/tree/develop/flutter_secure_storage_linux/linux/include) stores all key-value pairs in a single item as JSON.
 
@@ -304,12 +301,15 @@ The application ID can be found in `linux/CMakeLists.txt`:
 set(APPLICATION_ID "...")
 ```
 
-### [`simple_secure_storage`](https://pub.dev/packages/simple_secure_storage)
+</details>
 
-> [!NOTE]
-> See also this [pull request](https://github.com/Skyost/SimpleSecureStorage/pull/15) that updates `simple_secure_storage_linux` to use `freedesktop_secret`.
+### `simple_secure_storage`
 
-[`simple_secure_storage_linux` uses the schema `fr.skyost.SimpleSecureStorage` with `data` attribute](https://github.com/Skyost/SimpleSecureStorage/blob/5940541cbb2a457a43735a6047434354c49bf77e/packages/simple_secure_storage_linux/linux/simple_secure_storage_linux_plugin.cc#L25-L36):
+Since version [`simple_secure_storage` `0.4.3`](https://pub.dev/packages/simple_secure_storage/changelog#043), the Linux implementation uses `freedesktop_secret`. More details in this [pull request](https://github.com/Skyost/SimpleSecureStorage/pull/15).
+
+<details><summary>Before 0.4.3</summary>
+
+[`simple_secure_storage_linux` used the schema `fr.skyost.SimpleSecureStorage` with a `data` attribute](https://github.com/Skyost/SimpleSecureStorage/blob/5940541cbb2a457a43735a6047434354c49bf77e/packages/simple_secure_storage_linux/linux/simple_secure_storage_linux_plugin.cc#L25-L36):
 
 ```c
 const SecretSchema* get_schema (void){
@@ -334,7 +334,9 @@ final lookupAttributes = {
 };
 ```
 
-### [`biometric_storage`](https://pub.dev/packages/biometric_storage)
+</details>
+
+### `biometric_storage`
 
 [`biometric_storage` uses the schema `design.codeux.BiometricStorage` with `name` attribute](https://github.com/authpass/biometric_storage/blob/main/linux/biometric_storage_plugin.cc#L62-L73):
 
@@ -362,9 +364,9 @@ final lookupAttributes = {
 };
 ```
 
-### [`dbus_secrets`](https://pub.dev/packages/dbus_secrets)
+### `dbus_secrets`
 
-`dbus_secrets` uses a simple [key-value lookup](https://github.com/akshaybabloo/dbus_secrets/blob/31da1752a3dd23bc82691f7a56d3239f6d63eadc/lib/dbus_secrets.dart#L227) and does not use GNOME libsecret.
+[`dbus_secrets`](https://pub.dev/packages/dbus_secrets) uses a simple [key-value lookup](https://github.com/akshaybabloo/dbus_secrets/blob/31da1752a3dd23bc82691f7a56d3239f6d63eadc/lib/dbus_secrets.dart#L227) and does not use GNOME libsecret.
 
 The lookup attributes:
 

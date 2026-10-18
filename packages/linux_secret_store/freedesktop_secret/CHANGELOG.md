@@ -1,6 +1,7 @@
 ## 0.1.6
 
 - Updates the `dbus` dependency constraint to support `0.7.14` and `0.8.0`.
+- Improves the README documentation
 
 ## 0.1.5
 
